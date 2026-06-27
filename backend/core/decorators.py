@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import jsonify
+from flask import jsonify, request
 
 def handle_errors(f):
     @wraps(f)

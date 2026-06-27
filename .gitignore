@@ -54,3 +54,10 @@ dist/
 # Logs
 *.log
 logs/
+
+
+# Inside .gitignore
+node_modules/
+backend/venv/
+.env
+__pycache__/
