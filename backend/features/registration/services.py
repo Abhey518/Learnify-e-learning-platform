@@ -1,21 +1,67 @@
-from ...core.supabase_client import get_supabase_client
+from core.supabase_client import supabase
 
-class AnalyticsService:
-    def __init__(self):
-        self.supabase = get_supabase_client()
+def register_user(name, email, password, role, resume_url):
+    
+    try:
+        
+        existing_user = supabase.table('profiles').select('id').eq('email', email).execute()
+        if existing_user.data:
+            return {"success": False, "status_code": 409, "error": "An account with this email already exists."}
+        
+        # 2. Fire request directly to Supabase Auth engine
+        auth_response = supabase.auth.sign_up({
+            "email": email,
+            "password": password,
+            "options": {
+                "data": {
+                    "name": name,
+                    "role": role,
+                    "resume_url": resume_url
+                }
+            }
+        })
 
-    def get_dashboard_data(self):
-        # Get overall dashboard analytics
-        pass
+        return {
+            "success": True, 
+            "status_code": 201, 
+            "user_id": auth_response.user.id,
+            "email": auth_response.user.email
+        }
+    except Exception as e:
+        return {"success": False, "status_code": 400, "error": str(e)}
 
-    def get_course_analytics(self, course_id):
-        # Get analytics for a specific course
-        pass
 
-    def get_user_analytics(self, user_id):
-        # Get analytics for a specific user
-        pass
+def authenticate_user(email, password):
+    """
+    Validates credentials against Supabase and pulls account permissions.
+    """
+    try:
+        # 1. Authenticate with password
+        auth_response = supabase.auth.sign_in_with_password({
+            "email": email,
+            "password": password
+        })
 
-    def generate_report(self, report_type, filters=None):
-        # Generate reports based on type and filters
-        pass
+        if not auth_response.user:
+            return {"success": False, "status_code": 401, "error": "Invalid email or password."}
+        
+        user_id = auth_response.user.id
+
+        # 2. Get profile custom role and tracking states
+        profile_query = supabase.table('profiles').select('name, role, status').eq('id', user_id).execute()
+
+        if not profile_query.data:
+            return {"success": False, "status_code": 404, "error": "Profile records are out of sync."}
+        
+        user_profile = profile_query.data[0]
+        
+        return {
+            "success": True,
+            "status_code": 200,
+            "user_id": user_id,
+            "name": user_profile.get('name'),
+            "role": user_profile.get('role'),
+            "status": user_profile.get('status')
+        }
+    except Exception as e:
+        return {"success": False, "status_code": 400, "error": str(e)}
