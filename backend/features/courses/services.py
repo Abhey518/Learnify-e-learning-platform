@@ -4,9 +4,11 @@ class CourseService:
     def __init__(self):
         self.supabase = get_supabase_client()
 
+    # Fetch all courses from the "courses" table in Supabase
     def get_all_courses(self):
-        # Fetch all courses from database
-        pass
+        
+        response = self.supabase.table('courses').select('*').execute()
+        return response.data
 
     def get_course_by_id(self, course_id):
         # Fetch course by ID

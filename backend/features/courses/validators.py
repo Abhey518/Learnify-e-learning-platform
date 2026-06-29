@@ -1,4 +1,4 @@
-from ...shared.utils.validators import validate_required_fields
+from shared.utils.validators import validate_required_fields
 
 def validate_course(data):
     required_fields = ['title', 'description', 'instructor_id']
