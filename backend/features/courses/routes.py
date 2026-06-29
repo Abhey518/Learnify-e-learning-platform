@@ -28,10 +28,30 @@ def get_course(course_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Create new course
 @courses_bp.route('', methods=['POST'])
 def create_course():
-    # Create new course
-    pass
+    try:
+        # Check if JSON data was sent
+        course_data = request.get_json(silent=True)
+
+        if not course_data:
+            return jsonify({"error": "Request body is empty"}), 400
+        
+        # Validate required fields
+        if not validate_course(course_data):
+            return jsonify({"error": "Missing required fields: title, description, or instructor_id"}), 400
+        
+        # If valid, proceed to insert in database
+        course = course_service.create_course(course_data)
+        if course:
+            return jsonify(course[0]), 201
+        
+        return jsonify({"error": "Failed to create course"}), 400
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+        
 
 @courses_bp.route('/<course_id>', methods=['PUT'])
 def update_course(course_id):

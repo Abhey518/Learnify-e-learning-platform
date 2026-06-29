@@ -16,9 +16,12 @@ class CourseService:
        response = self.supabase.table('courses').select('*').eq('id', course_id).execute()
        return response.data
 
+    # Create new course
     def create_course(self, course_data):
-        # Create new course
-        pass
+        
+        response = self.supabase.table('courses').insert(course_data).execute()
+        return response.data
+
 
     def update_course(self, course_id, course_data):
         # Update course
