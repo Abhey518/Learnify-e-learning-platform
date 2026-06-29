@@ -15,11 +15,18 @@ def get_courses():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-
+# Get specific course
 @courses_bp.route('/<course_id>', methods=['GET'])
 def get_course(course_id):
-    # Get specific course
-    pass
+    try:
+        course = course_service.get_course_by_id(course_id)
+        if not course:
+            return jsonify({"error": "Course not found"}), 404
+        
+        return jsonify(course[0]), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @courses_bp.route('', methods=['POST'])
 def create_course():

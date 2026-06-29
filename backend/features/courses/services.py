@@ -10,9 +10,11 @@ class CourseService:
         response = self.supabase.table('courses').select('*').execute()
         return response.data
 
+    # Fetch course by ID
     def get_course_by_id(self, course_id):
-        # Fetch course by ID
-        pass
+       
+       response = self.supabase.table('courses').select('*').eq('id', course_id).execute()
+       return response.data
 
     def create_course(self, course_data):
         # Create new course
