@@ -92,7 +92,7 @@ export default function Navbar() {
                   <Link 
                     to="/login" 
                     className="btn btn-sm px-4 py-2 fw-semibold text-white rounded-pill shadow-sm transition-all"
-                    style={{ backgroundColor: '#6f42c1' }}
+                    style={{ backgroundColor: '#4b2194' }}
                   >
                     Sign In
                   </Link>
