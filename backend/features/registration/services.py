@@ -32,9 +32,6 @@ def register_user(name, email, password, role, resume_url):
 
 
 def authenticate_user(email, password):
-    """
-    Validates credentials against Supabase and pulls account permissions.
-    """
     try:
         
         auth_response = supabase.auth.sign_in_with_password({

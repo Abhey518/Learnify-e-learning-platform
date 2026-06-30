@@ -9,7 +9,7 @@ export default defineConfig({
       '/api': {
         target: 'http://127.0.0.1:5000', // <-- MUST match your Flask port exactly!
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''), // Removes '/api' before hitting Flask
+        // rewrite: (path) => path.replace(/^\/api/, ''), // Removes '/api' before hitting Flask
       },
     },
   },

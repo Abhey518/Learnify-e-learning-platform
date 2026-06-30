@@ -19,8 +19,10 @@ export default function Navbar() {
           if (data && data.logged_in === true) {
             setUser({
               logged_in: true,
-              role: data.role || 'student'
+              role: data.role || 'student',
+              name: data.name || 'User' // Synchronize user name field records
             });
+            const isLogeed = true;
           } else {
             setUser({ logged_in: false, role: null });
           }
@@ -30,6 +32,19 @@ export default function Navbar() {
           setUser({ logged_in: false, role: null });
         });
     }, [location.pathname]); // Re-verify whenever the user moves between pages
+
+
+    // Clean application logout cleanup task routine routing
+  const handleSignOut = async () => {
+    try {
+      const response = await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+      if (response.ok) {
+        window.location.href = '/'; // Hard refresh to reset root SPA context variables completely
+      }
+    } catch (err) {
+      console.error("Logout dispatch failure execution trace:", err);
+    }
+  };
 
   // Determine button active highlighting states natively using current location path
   const isLoginPage = location.pathname === '/login';
@@ -72,21 +87,70 @@ export default function Navbar() {
           </ul>
 
           {/* Action Call Routing Block Container */}
+          {/* Action Call Routing Block Container */}
           <div className="d-flex align-items-center gap-2 mt-2 mt-md-0">
             {user && user.logged_in ? (
-              /* Shortcut if they are logged in */
-              <Link 
-                to={
-                  user.role === 'instructor' ? '/dashboard/instructor' : 
-                  user.role === 'admin' ? '/admin' : '/dashboard/student'
-                }
-                className="btn btn-sm px-4 py-2 fw-semibold text-white rounded-pill"
-                style={{ backgroundColor: '#6f42c1' }}
-              >
-                Go to Dashboard <i className="bi bi-arrow-right ms-1"></i>
-              </Link>
+              /* --- User Is Authenticated Successfully: Show Profile Dropdown Menu --- */
+              <div className="dropdown">
+                <button 
+                  className="btn btn-sm d-flex align-items-center gap-2 px-3 py-2 rounded-pill border shadow-sm text-dark bg-light dropdown-toggle"
+                  type="button" 
+                  id="navbarUserDropdown" 
+                  data-bs-toggle="dropdown" 
+                  aria-expanded="false"
+                  style={{ fontWeight: '600' }}
+                >
+                  <i className="bi bi-person-circle fs-5" style={{ color: '#6f42c1' }}></i>
+                  <span>{user.name}</span>
+                </button>
+                
+                {/* Dropdown Items Overlaid Box Grid Alignments */}
+                <ul className="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2.5 rounded-3 text-start animate-fadeIn" aria-labelledby="navbarUserDropdown" style={{ minWidth: '210px' }}>
+                  {/* Informational Header Section item slot */}
+                  <li className="px-3 py-2 border-bottom mb-2 bg-light/40 rounded-2">
+                    <div className="small text-muted fw-normal" style={{ fontSize: '0.75rem' }}>Signed in as</div>
+                    <div className="fw-bold text-dark text-truncate">{user.name}</div>
+                    <span className="badge text-capitalize mt-1 px-2 py-1 text-white" style={{ backgroundColor: '#6f42c1', fontSize: '0.7rem' }}>
+                      {user.role}
+                    </span>
+                  </li>
+                  
+                  {/* Context Dashboard Nav Links */}
+                  <li>
+                    <Link 
+                      className="dropdown-item py-2 small rounded-2 fw-medium text-dark d-flex align-items-center" 
+                      to={
+                        user.role === 'instructor' ? '/dashboard/instructor' : 
+                        user.role === 'admin' ? '/admin' : '/dashboard/student'
+                      }
+                    >
+                      <i className="bi bi-speedometer2 me-2 text-secondary"></i> My Dashboard
+                    </Link>
+                  </li>
+                  
+                  <li>
+                    <Link className="dropdown-item py-2 small rounded-2 fw-medium text-dark d-flex align-items-center" to="/profile/settings">
+                      <i className="bi bi-gear me-2 text-secondary"></i> Account Settings
+                    </Link>
+                  </li>
+                  
+                  {/* Divider Action Separator Line */}
+                  <li><hr className="dropdown-divider my-2 border-slate-100" /></li>
+                  
+                  {/* Destructive Logging Action item button link */}
+                  <li>
+                    <button 
+                      onClick={handleSignOut}
+                      className="dropdown-item py-2 small rounded-2 fw-semibold text-danger d-flex align-items-center"
+                      type="button"
+                    >
+                      <i className="bi bi-box-arrow-right me-2"></i> Sign Out
+                    </button>
+                  </li>
+                </ul>
+              </div>
             ) : (
-              /* User is logged out */
+              /* --- User is Logged Out: Render Public Default Route Buttons --- */
               <>
                 {location.pathname !== '/login' && (
                   <Link 

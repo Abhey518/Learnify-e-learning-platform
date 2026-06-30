@@ -85,14 +85,22 @@ def logout():
 
 
 @auth.route('/current-user', methods=['GET'])
-def current_user():
-    user_id = session.get('user_id')
-    if not user_id:
-        return jsonify({"error": "No user is currently logged in."}), 401
-
+def get_current_user():
+    try:
+        
+        if session and session.get('user_id'):
+            return jsonify({
+                "logged_in": True,
+                "name" : session.get('name'),
+                "role": session.get('user_role', 'Student'),
+                "status": session.get('user_status')
+            }), 200
+            
+    except Exception as e:
+        print(f"Session verification logging anomaly: {str(e)}")
+        
     return jsonify({
-        "user_id": user_id,
-        "name": session.get("name"),
-        "role": session.get('user_role'),
-        "status": session.get('user_status')
+        "logged_in": False, 
+        "role": None, 
+        "status": None
     }), 200
