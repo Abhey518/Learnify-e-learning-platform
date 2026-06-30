@@ -22,10 +22,11 @@ class CourseService:
         response = self.supabase.table('courses').insert(course_data).execute()
         return response.data
 
-
+    # Update course
     def update_course(self, course_id, course_data):
-        # Update course
-        pass
+        
+        response = self.supabase.table("courses").update(course_data).eq("id", course_id).execute()
+        return response.data
 
     def delete_course(self, course_id):
         # Delete course
