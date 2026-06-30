@@ -36,7 +36,7 @@ def authenticate_user(email, password):
     Validates credentials against Supabase and pulls account permissions.
     """
     try:
-        # 1. Authenticate with password
+        
         auth_response = supabase.auth.sign_in_with_password({
             "email": email,
             "password": password
@@ -47,7 +47,7 @@ def authenticate_user(email, password):
         
         user_id = auth_response.user.id
 
-        # 2. Get profile custom role and tracking states
+        
         profile_query = supabase.table('profiles').select('name, role, status').eq('id', user_id).execute()
 
         if not profile_query.data:
