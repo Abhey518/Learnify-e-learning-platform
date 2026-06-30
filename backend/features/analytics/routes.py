@@ -1,19 +1,154 @@
-from flask import Blueprint, request, jsonify
-from .services import AnalyticsService
+from flask import Blueprint, request, jsonify, g, session
+from core.middleware import verify_supabase_token
+from .services import create_course_review, get_course_reviews_and_average, get_instructor_metrics, delete_review_by_admin, get_pending_instructors, update_instructor_status
+from .validators import validate_review_data, validate_dashboard_filters, validate_approval_status
 
-analytics_bp = Blueprint('analytics', __name__, url_prefix='/api/analytics')
 
-@analytics_bp.route('/dashboard', methods=['GET'])
-def get_dashboard():
-    # Get analytics dashboard data
-    pass
+analytics = Blueprint('analytics', __name__)
 
-@analytics_bp.route('/course/<course_id>', methods=['GET'])
-def get_course_analytics(course_id):
-    # Get course-specific analytics
-    pass
 
-@analytics_bp.route('/user/<user_id>', methods=['GET'])
-def get_user_analytics(user_id):
-    # Get user-specific analytics
-    pass
+# Course Review Pipeline
+@analytics.route('/reviews', methods=['POST'])
+def post_review():
+    auth_error = verify_supabase_token()
+    if auth_error:
+        return auth_error
+    
+    data = request.get_json() or {}
+
+    is_valid, validation_errors = validate_review_data(data)
+    if not is_valid:
+        return jsonify({"errors": validation_errors}), 400
+    
+    result = create_course_review(
+        student_id=g.user_id,
+        course_id=data['course_id'],
+        rating=data['rating'],
+        comment=data.get('comment', '')
+    )
+
+    if not result['success']:
+        return jsonify({"error": result['error']}), 400
+    
+    return jsonify({"message": "Review submitted successfully!", "review": result['data']}), 201
+
+
+@analytics.route('/courses/<int:course_id>/reviews', methods=['GET'])
+def get_reviews(course_id):
+    result = get_course_reviews_and_average(course_id)
+
+    if not result['success']:
+        return jsonify({"error": request['error']}), 500
+    
+    return jsonify(result), 200
+
+
+
+# Instructor Performance Metrics
+@analytics.route('/instructor/dashboard', methods=['GET'])
+def get_dashboard_analytics():
+    auth_error = verify_supabase_token()
+    if auth_error:
+        return auth_error
+    
+    if g.user_role not in ['instructor', 'admin']:
+        return jsonify({"error": "Access Denied: Only instructors can access this reporting view."}), 403
+    
+    is_valid, validation_errors = validate_dashboard_filters(request.args)
+    if not is_valid:
+        return jsonify({"errors": validation_errors}), 400
+    
+    target_course = request.args.get('course_id')
+
+    result = get_instructor_metrics(
+        instructor_id=g.user_id,
+        target_course_id=int(target_course) if target_course else None
+    )
+
+    if not result['success']:
+        return jsonify({"error": result['error']}), 500
+    
+    return jsonify(result), 200
+
+
+# Admin Platform Gatekeeper
+@analytics.route('/admin/pending-instructors', methods=['GET'])
+def list_pending_instructors():
+
+    user_id = session.get('user_id')
+    user_role = session.get('user_role')
+
+    if not user_id:
+        return jsonify({"error": "Unauthenticated: No active session found."}), 401
+    
+    if user_role != 'admin':
+        return jsonify({"error": "Access Denied: Administrative privileges required."}), 403
+    
+    result = get_pending_instructors()
+
+    if not result['success']:
+        return jsonify({"error": result['error']}), 500
+    
+    return jsonify({
+        "success": True,
+        "applications": result['applications']
+    }), 200
+
+    # # ---- DEBUGS FOR SESSION TRACKING ----
+    # print("--- ADMIN ENDPOINT HIT ---")
+    # print("Full Session Object Data:", dict(session))
+    # print("Session user_id:", session.get('user_id'))
+    # print("Session user_role:", session.get('user_role'))
+    # # -------------------------------------
+
+    # auth_error = verify_supabase_token()
+    # if auth_error:
+    #     return auth_error
+    
+    # if g.user_role != 'admin':
+    #     return jsonify({"error": "Access Denied: Administrative privileges required."}), 403
+    
+    # result = get_pending_instructors()
+    # if not result['success']:
+    #     return jsonify({"error": result['error']}), 500
+
+    # return jsonify(result), 200
+
+@analytics.route('/admin/process-instructor', methods=['PUT'])
+def process_instructor():
+    auth_error = verify_supabase_token()
+    if auth_error:
+        return auth_error
+    
+    if g.user_role != 'admin':
+        return jsonify({"error": "Access Denied: Administrative privileges required."}), 403
+    
+    data = request.get_json() or {}
+    is_valid, validation_errors = validate_approval_status(data)
+    if not is_valid:
+        return jsonify({"errors": validation_errors}), 400
+    
+    result = update_instructor_status(user_id=data['user_id'], status=data['status'])
+    if not result['success']:
+        return jsonify({"error": result['error']}), 400
+    
+    return jsonify({
+        "message": f"Instructor application status updated to '{data['status']}' successfully.",
+        "profile": result['profile']
+    }), 200
+
+
+@analytics.route('/admin/reviews/<int:review_id>', methods=['DELETE'])
+def admin_delete_review(review_id):
+    auth_error = verify_supabase_token()
+    if auth_error:
+        return auth_error
+
+    if g.user_role != 'admin':
+        return jsonify({"error": "Access Denied: Administrative privileges required."}), 403
+    
+    result = delete_review_by_admin(review_id)
+    if not result['success']:
+        return jsonify({"error": result['error']}), 400
+
+    return jsonify({"message": "Review deleted successfully by administrator moderation override."}), 200

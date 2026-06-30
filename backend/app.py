@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 from flask_cors import CORS
-from features.registration.auth import auth
+from features.registration.routes import auth
 
 
 app = Flask(__name__)

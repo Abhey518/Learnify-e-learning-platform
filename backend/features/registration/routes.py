@@ -8,13 +8,11 @@ auth = Blueprint('auth', __name__)
 def signup():
     data = request.get_json() or {}
     
-    # 1. Validate incoming format payload structures
     is_valid, validation_error = validate_signup_data(data)
     if not is_valid:
         flash(validation_error, "error")
         return jsonify({"error": validation_error}), 400
         
-    # 2. Run background registration transactions
     result = register_user(
         name=data.get('name'),
         email=data.get('email'),
@@ -26,11 +24,14 @@ def signup():
     if not result['success']:
         flash(result['error'], "error")
         return jsonify({"error": result['error']}), result['status_code']
+    
+    
         
     flash(f"User registered successfully! {result['email']}", "success")
     return jsonify({
         "message": "User registered successfully!",
-        "user_id": result['user_id']
+        "user_id": result['user_id'],
+        "redirect_url": "/login"
     }), result['status_code']
 
 
