@@ -2,10 +2,13 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
+import ProtectedRoute from './components/ProtectedRoute'
 
 import RegisterPage from './features/registration/RegisterPage';
 import LoginPage from './features/registration/LoginPage';
 import LandingPage from './LandingPage';
+import CoursesPage from './features/analytics/CoursesPage';
+import AdminDashboardPage from './features/analytics/AdminDashboardPage';
 
 
 export default function App() {
@@ -21,9 +24,23 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-
+          <Route path="/courses" element={<CoursesPage />} />
           {/* Catch-all Fallback Safety Routing Block */}
           <Route path="*" element={<Navigate to="/" replace />} />
+
+
+          <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <AdminDashboardPage />
+            </ProtectedRoute>
+          } 
+        />
+
+
+
+
         </Routes>
       </main>
     </Router>

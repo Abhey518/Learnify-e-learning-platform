@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, g, session
 from core.middleware import verify_supabase_token
-from .services import create_course_review, get_course_reviews_and_average, get_instructor_metrics, delete_review_by_admin, get_pending_instructors, update_instructor_status
+from core.decorators import login_required, role_required
+from .services import create_course_review, get_course_reviews_and_average, get_instructor_metrics, delete_review_by_admin, get_pending_instructors, update_instructor_status, fetch_all_reviews, get_all_students, get_all_instructors, delete_user_by_admin
 from .validators import validate_review_data, validate_dashboard_filters, validate_approval_status
 
 
@@ -10,9 +11,11 @@ analytics = Blueprint('analytics', __name__)
 # Course Review Pipeline
 @analytics.route('/reviews', methods=['POST'])
 def post_review():
-    auth_error = verify_supabase_token()
-    if auth_error:
-        return auth_error
+    user_id = session.get('user_id')
+    # user_role = session.get('user_role')
+
+    if not user_id:
+        return jsonify({"error": "Unauthenticated: No active session found."}), 401
     
     data = request.get_json() or {}
 
@@ -21,7 +24,7 @@ def post_review():
         return jsonify({"errors": validation_errors}), 400
     
     result = create_course_review(
-        student_id=g.user_id,
+        student_id=user_id,
         course_id=data['course_id'],
         rating=data['rating'],
         comment=data.get('comment', '')
@@ -41,6 +44,21 @@ def get_reviews(course_id):
         return jsonify({"error": request['error']}), 500
     
     return jsonify(result), 200
+
+
+@analytics.route('/reviews', methods=['GET'])
+def get_all_reviews():
+    user_id = session.get('user_id')
+    user_role = session.get('user_role')
+
+    if not user_id or user_role != 'admin':
+        return jsonify({"error": "Access Denied: Administrative privileges required."}), 403
+
+    result = fetch_all_reviews()
+    if not result['success']:
+        return jsonify({"error": result['error']}), 500
+
+    return jsonify(result['data']), 200
 
 
 
@@ -74,7 +92,6 @@ def get_dashboard_analytics():
 # Admin Platform Gatekeeper
 @analytics.route('/admin/pending-instructors', methods=['GET'])
 def list_pending_instructors():
-
     user_id = session.get('user_id')
     user_role = session.get('user_role')
 
@@ -94,25 +111,6 @@ def list_pending_instructors():
         "applications": result['applications']
     }), 200
 
-    # # ---- DEBUGS FOR SESSION TRACKING ----
-    # print("--- ADMIN ENDPOINT HIT ---")
-    # print("Full Session Object Data:", dict(session))
-    # print("Session user_id:", session.get('user_id'))
-    # print("Session user_role:", session.get('user_role'))
-    # # -------------------------------------
-
-    # auth_error = verify_supabase_token()
-    # if auth_error:
-    #     return auth_error
-    
-    # if g.user_role != 'admin':
-    #     return jsonify({"error": "Access Denied: Administrative privileges required."}), 403
-    
-    # result = get_pending_instructors()
-    # if not result['success']:
-    #     return jsonify({"error": result['error']}), 500
-
-    # return jsonify(result), 200
 
 @analytics.route('/admin/process-instructor', methods=['PUT'])
 def process_instructor():
@@ -140,14 +138,104 @@ def process_instructor():
 
 @analytics.route('/admin/reviews/<int:review_id>', methods=['DELETE'])
 def admin_delete_review(review_id):
-    auth_error = verify_supabase_token()
-    if auth_error:
-        return auth_error
+    user_id = session.get('user_id')
+    user_role = session.get('user_role')
 
-    if g.user_role != 'admin':
+    if not user_id:
+        return jsonify({"error": "Unauthenticated: No active session found."}), 401
+
+    if user_role != 'admin':
         return jsonify({"error": "Access Denied: Administrative privileges required."}), 403
     
     result = delete_review_by_admin(review_id)
+    if not result['success']:
+        return jsonify({"error": result['error']}), 400
+
+    return jsonify({"message": "Review deleted successfully by administrator moderation override."}), 200
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@analytics.route('/admin/students', methods=['GET'])
+def admin_get_students():
+    user_id = session.get('user_id')
+    user_role = session.get('user_role')
+
+    if not user_id:
+        return jsonify({"error": "Unauthenticated: No active session found."}), 401
+
+    if user_role != 'admin':
+        return jsonify({"error": "Access Denied: Administrative privileges required."}), 403
+    
+    result = get_all_students()
+    if not result['success']:
+        return jsonify({"error": result['error']}), 400
+
+    return jsonify(result['data']), 200
+
+
+
+@analytics.route('/admin/instructors', methods=['GET'])
+def admin_get_instructor():
+    user_id = session.get('user_id')
+    user_role = session.get('user_role')
+
+    if not user_id:
+        return jsonify({"error": "Unauthenticated: No active session found."}), 401
+
+    if user_role != 'admin':
+        return jsonify({"error": "Access Denied: Administrative privileges required."}), 403
+    
+    result = get_all_instructors()
+    if not result['success']:
+        return jsonify({"error": result['error']}), 400
+
+    return jsonify(result['data']), 200
+
+
+
+@analytics.route('/admin/students/<id>', methods=['DELETE'])
+def admin_delete_student(id):
+    user_id = session.get('user_id')
+    user_role = session.get('user_role')
+
+    if not user_id:
+        return jsonify({"error": "Unauthenticated: No active session found."}), 401
+
+    if user_role != 'admin':
+        return jsonify({"error": "Access Denied: Administrative privileges required."}), 403
+    
+    result = delete_user_by_admin(id)
+    if not result['success']:
+        return jsonify({"error": result['error']}), 400
+
+    return jsonify({"message": "Review deleted successfully by administrator moderation override."}), 200
+
+
+
+@analytics.route('/admin/instructors/<id>', methods=['DELETE'])
+def admin_delete_instructors(id):
+    user_id = session.get('user_id')
+    user_role = session.get('user_role')
+
+    if not user_id:
+        return jsonify({"error": "Unauthenticated: No active session found."}), 401
+
+    if user_role != 'admin':
+        return jsonify({"error": "Access Denied: Administrative privileges required."}), 403
+    
+    result = delete_user_by_admin(id)
     if not result['success']:
         return jsonify({"error": result['error']}), 400
 

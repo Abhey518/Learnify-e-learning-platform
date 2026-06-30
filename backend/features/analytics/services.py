@@ -162,3 +162,90 @@ def delete_review_by_admin(review_id):
     except Exception as e:
         return {"success": False, "error": str(e)}
 
+
+
+def fetch_all_reviews():
+    try:
+        response = supabase.table("reviews") \
+            .select("""
+                id,
+                rating,
+                comment,
+                created_at,
+                course_id,
+                student_id,
+                profiles (
+                    name
+                )
+            """) \
+            .order("created_at", desc=True) \
+            .execute()
+            
+        return {"success": True, "data": response.data}
+        
+    except Exception as e:
+        print(f"Error fetching reviews with profiles: {str(e)}")
+        fallback = supabase.table("reviews").select("*").order("created_at", desc=True).execute()
+        return {"success": True, "data": fallback.data}
+    
+
+def get_all_instructors():
+    try:
+        response = supabase.table("profiles") \
+            .select("""
+                name,
+                email,
+                status,
+                resume_url,
+                created_at    
+"""
+            ) \
+            .eq("role", 'instructor') \
+            .order("created_at", desc=True) \
+            .execute()
+        
+        return {"success": True, "data": response.data}
+    
+    except Exception as e:
+        print(f"Error fetching profiles with profiles: {str(e)}")
+        fallback = supabase.table("profiles").select("*").order("created_at", desc=True).execute()
+        return {"success": True, "data": fallback.data}
+
+
+
+
+def get_all_students():
+    try:
+        response = supabase.table("profiles") \
+            .select("""
+                name,
+                email,
+                created_at    
+"""
+            ) \
+            .eq("role", 'student' or '') \
+            .order("created_at", desc=True) \
+            .execute()
+        
+        return {"success": True, "data": response.data}
+    
+    except Exception as e:
+        print(f"Error fetching users with profiles: {str(e)}")
+        fallback = supabase.table("profiles").select("*").order("created_at", desc=True).execute()
+        return {"success": True, "data": fallback.data}
+    
+
+def delete_user_by_admin(id):
+    try:
+        response = supabase.table("profiles") \
+            .delete() \
+            .eq("id", id) \
+            .execute()
+        
+        if not response.data:
+            return {"success": False, "error": "user not found or already removed."}
+        
+        return {"success": True}
+    
+    except Exception as e:
+        return {"success": False, "error": str(e)}
