@@ -106,5 +106,16 @@ def update_course(course_id):
 # Delete course
 @courses_bp.route('/<course_id>', methods=['DELETE'])
 def delete_course(course_id):
-    
-    pass
+    try:
+        # Delete course using service
+        course = course_service.delete_course(course_id)
+        
+        # Return success message
+        if course:
+            return jsonify({"message": "Course deleted successfully"}), 200
+            
+        # Handle course not found
+        return jsonify({"error": "Course not found"}), 404
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

@@ -60,6 +60,10 @@ class CourseService:
         return response.data
 
 
+    # Delete a course by ID
     def delete_course(self, course_id):
-        # Delete course
-        pass
+
+        # Delete an existing course from the database
+        response = self.supabase.table("courses").delete().eq("id", course_id).execute()
+        return response.data
+       
