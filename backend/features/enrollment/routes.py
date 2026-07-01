@@ -43,3 +43,15 @@ def enroll_course():
         return jsonify({"error": str(ve)}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+    # FR-2.3: Unenroll
+@enrollment_bp.route("/<enrollment_id>", methods=["DELETE"])
+def unenroll(enrollment_id):
+    try:
+        result = enrollment_service.unenroll_user(enrollment_id)
+        if not result:
+            return jsonify({"error": "Enrollment record not found"}), 404
+        return jsonify({"message": "Enrollment deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

@@ -29,3 +29,12 @@ class EnrollmentService:
             }) \
             .execute()
         return response.data
+
+        
+ # FR-2.3: Unenroll student from course
+    def unenroll_user(self, enrollment_id):
+        response = self.supabase.table("enrollments") \
+            .delete() \
+            .eq("id", enrollment_id) \
+            .execute()
+        return response.data
