@@ -42,12 +42,14 @@ class CourseService:
         return response.data
 
        
-    # Create new course
+    # Create a new course
     def create_course(self, course_data):
-        
-        response = self.supabase.table('courses').insert(course_data).execute()
-        return response.data
 
+        # Insert a new course into the database
+        response = self.supabase.table("courses").insert(course_data).execute()
+        return response.data
+    
+    
     # Update course
     def update_course(self, course_id, course_data):
         
