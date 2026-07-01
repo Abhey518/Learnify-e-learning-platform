@@ -1,4 +1,4 @@
-from ...core.supabase_client import get_supabase_client
+from core.supabase_client import get_supabase_client
 
 class EnrollmentService:
     def __init__(self):
