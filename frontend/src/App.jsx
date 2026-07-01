@@ -7,8 +7,10 @@ import ProtectedRoute from './components/ProtectedRoute'
 import RegisterPage from './features/registration/RegisterPage';
 import LoginPage from './features/registration/LoginPage';
 import LandingPage from './LandingPage';
-import CoursesPage from './features/analytics/CoursesPage';
+import CoursesPage from './features/courses/CoursesPage';
 import AdminDashboardPage from './features/analytics/AdminDashboardPage';
+import SubmitReviewForm from './features/analytics/SubmitReviewForm';
+import CourseReviewsSection from './components/CourseReviewsSection';
 
 
 export default function App() {
@@ -25,6 +27,9 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/submit-review" element={<SubmitReviewForm />} />
+          <Route path="/course-reviews/:courseId" element={<CourseReviewsSection />} />
+
           {/* Catch-all Fallback Safety Routing Block */}
           <Route path="*" element={<Navigate to="/" replace />} />
 

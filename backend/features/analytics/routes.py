@@ -61,6 +61,26 @@ def get_all_reviews():
     return jsonify(result['data']), 200
 
 
+@analytics.route('/admin/reviews/<int:review_id>', methods=['DELETE'])
+def admin_delete_review(review_id):
+    user_id = session.get('user_id')
+    user_role = session.get('user_role')
+
+    if not user_id:
+        return jsonify({"error": "Unauthenticated: No active session found."}), 401
+
+    if user_role != 'admin':
+        return jsonify({"error": "Access Denied: Administrative privileges required."}), 403
+    
+    result = delete_review_by_admin(review_id)
+    if not result['success']:
+        return jsonify({"error": result['error']}), 400
+
+    return jsonify({"message": "Review deleted successfully by administrator moderation override."}), 200
+
+
+
+
 
 # Instructor Performance Metrics
 @analytics.route('/instructor/dashboard', methods=['GET'])
@@ -136,22 +156,7 @@ def process_instructor():
     }), 200
 
 
-@analytics.route('/admin/reviews/<int:review_id>', methods=['DELETE'])
-def admin_delete_review(review_id):
-    user_id = session.get('user_id')
-    user_role = session.get('user_role')
 
-    if not user_id:
-        return jsonify({"error": "Unauthenticated: No active session found."}), 401
-
-    if user_role != 'admin':
-        return jsonify({"error": "Access Denied: Administrative privileges required."}), 403
-    
-    result = delete_review_by_admin(review_id)
-    if not result['success']:
-        return jsonify({"error": result['error']}), 400
-
-    return jsonify({"message": "Review deleted successfully by administrator moderation override."}), 200
 
 
 
