@@ -5,7 +5,7 @@ from .validators import validate_course
 courses_bp = Blueprint('courses', __name__, url_prefix='/api/courses')
 course_service = CourseService() #initialize the service class
 
-# Retrieve all courses
+# Retrieve all courses (Public)
 @courses_bp.route('', methods=['GET'])
 def get_courses():
     try:
@@ -22,7 +22,7 @@ def get_courses():
         return jsonify({"error":str(e)}), 500
 
 
-# Retrieve a specific course by ID
+# Retrieve a specific course by ID (Public)
 @courses_bp.route('/<course_id>', methods=['GET'])
 def get_course(course_id):
     try:
@@ -43,7 +43,7 @@ def get_course(course_id):
         return jsonify({"error": str(e)}), 500
 
 
-# Create a new course
+# Create a new course (Instructor Only)
 @courses_bp.route('', methods=['POST'])
 def create_course():
     try:
@@ -72,7 +72,7 @@ def create_course():
         return jsonify({"error": str(e)}), 500
         
 
-# Update course
+# Update course (Instructor Only)
 @courses_bp.route('/<course_id>', methods=['PUT'])
 def update_course(course_id):
     try:
@@ -103,7 +103,7 @@ def update_course(course_id):
         return jsonify({"error": str(e)}), 500
     
 
-# Delete course
+# Delete course (Instructor Only)
 @courses_bp.route('/<course_id>', methods=['DELETE'])
 def delete_course(course_id):
     try:
@@ -117,5 +117,36 @@ def delete_course(course_id):
         # Handle course not found
         return jsonify({"error": "Course not found"}), 404
         
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Create a new module (Instructor Only)
+@courses_bp.route('/modules', methods=['POST'])
+def create_module():
+    try:
+        # Get JSON request body
+        module_data = request.get_json(silent=True)
+
+        # Handle empty request body
+        if not module_data:
+            return jsonify({"error": "Request body is empty"}), 400
+
+        # Validate required fields
+        from .validators import validate_module
+
+        if not validate_module(module_data):
+            return jsonify({"error": "Missing required fields: course_id, title, or order_no"}), 400
+        
+        # Create module using service
+        module = course_service.create_module(module_data)
+
+        # Return created module object
+        if module:
+            return jsonify(module[0]), 201
+
+        # Handle module creation failure
+        return jsonify({"error": "Failed to create module"}), 400
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500

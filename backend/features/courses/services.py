@@ -66,4 +66,13 @@ class CourseService:
         # Delete an existing course from the database
         response = self.supabase.table("courses").delete().eq("id", course_id).execute()
         return response.data
+    
+
+    # Create a new module
+    def create_module(self, module_data):
+
+        # Insert a new module into the database
+        # For Instructor
+        response = self.supabase.table("modules").insert(module_data).execute()
+        return response.data
        
