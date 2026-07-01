@@ -26,14 +26,17 @@ def get_courses():
 @courses_bp.route('/<course_id>', methods=['GET'])
 def get_course(course_id):
     try:
-        # Query course by ID
-        course = course_service.get_course_by_id(course_id)
+        # Get optional instructor ID query parameter
+        instructor_id = request.args.get('instructor_id')
 
-        # Check if the returned list is empty
+        # Fetch course from service
+        course = course_service.get_course_by_id(course_id, instructor_id=instructor_id)
+
+        # Handle course not found
         if not course:
             return jsonify({"error": "Course not found"}), 404
         
-        # Return the single course object
+        # Return single course object
         return jsonify(course[0]), 200
 
     except Exception as e:

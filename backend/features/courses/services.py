@@ -23,14 +23,25 @@ class CourseService:
         return response.data
 
 
-    # Fetch course by ID
-    def get_course_by_id(self, course_id):
+    # Fetch a single course by its unique ID
+    def get_course_by_id(self, course_id, instructor_id=None):
        
-       # Run a select query filtered by course ID
-       response = self.supabase.table('courses').select('*').eq('id', course_id).execute()
-       return response.data
+        # Initialize base query
+        query = self.supabase.table("courses").select("*").eq("id", course_id)
 
+        # Apply filters based on request context
+        # For Instructor -> Get course (draft or published)
+        if instructor_id:
+            query = query.eq("instructor_id", instructor_id)
 
+        # For Student -> Get only published course
+        else:
+            query = query.eq("is_published", True)
+
+        response = query.execute()
+        return response.data
+
+       
     # Create new course
     def create_course(self, course_data):
         
