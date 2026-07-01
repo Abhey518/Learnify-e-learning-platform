@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from .services import CourseService
-from .validators import validate_course
 
 courses_bp = Blueprint('courses', __name__, url_prefix='/api/courses')
 course_service = CourseService() #initialize the service class
@@ -55,6 +54,8 @@ def create_course():
             return jsonify({"error": "Request body is empty"}), 400
         
         # Validate required fields
+        from .validators import validate_course
+
         if not validate_course(course_data):
             return jsonify({"error": "Missing required fields: title, description, or instructor_id"}), 400
         
@@ -223,3 +224,35 @@ def delete_module(module_id):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+# Create a new lesson (Instructor Only)
+@courses_bp.route('/lessons', methods=['POST'])
+def create_lesson():
+    try:
+        # Get JSON request body
+        lesson_data = request.get_json(silent=True)
+
+        # Handle empty request body
+        if not lesson_data:
+            return jsonify({"error": "Request body is empty"}), 400
+
+        # Validate required fields
+        from .validators import validate_lesson
+
+        if not validate_lesson(lesson_data):
+            return jsonify({"error": "Missing required fields: module_id, title, or order_no"}), 400
+
+        # Create lesson using service
+        lesson = course_service.create_lesson(lesson_data)
+
+        # Return created lesson object
+        if lesson:
+            return jsonify(lesson[0]), 201
+
+        # Handle lesson creation failure
+        return jsonify({"error": "Failed to create lesson"}), 400
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    

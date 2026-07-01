@@ -101,3 +101,11 @@ class CourseService:
         # For Instructor
         response = self.supabase.table("modules").delete().eq("id", module_id).execute()
         return response.data
+    
+
+    # Create a new lesson
+    def create_lesson(self, lesson_data):
+        # Insert a new lesson into the database
+        # For Instructor
+        response = self.supabase.table("lessons").insert(lesson_data).execute()
+        return response.data
