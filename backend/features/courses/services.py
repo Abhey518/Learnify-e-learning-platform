@@ -5,9 +5,21 @@ class CourseService:
         self.supabase = get_supabase_client()
 
     # Fetch all courses from the "courses" table in Supabase
-    def get_all_courses(self):
+    def get_all_courses(self, instructor_id=None):
         
-        response = self.supabase.table('courses').select('*').execute()
+        # Initialize the base query
+        query = self.supabase.table("courses").select("*")
+
+        # If instructor_id is provided, retrieve all courses (including drafts) for that instructor
+        if instructor_id:
+            query = query.eq("instructor_id", instructor_id)
+
+        # Otherwise, retrieve only published courses for the public catalog
+        else:
+            query = query.eq("is_published", True)
+
+        # Execute query and return data
+        response = query.execute()
         return response.data
 
     # Fetch course by ID

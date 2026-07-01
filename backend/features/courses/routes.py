@@ -5,15 +5,19 @@ from .validators import validate_course
 courses_bp = Blueprint('courses', __name__, url_prefix='/api/courses')
 course_service = CourseService() #initialize the service class
 
-# Fetch the courses using the service
+# Retrieve all courses
 @courses_bp.route('', methods=['GET'])
 def get_courses():
     try:
-        courses = course_service.get_all_courses()
+        # Retrieve the optional instructor_id query parameter from the request URL
+        instructor_id = request.args.get('instructor_id')
+
+        # Fetch courses filtered by instructor ID or public published state
+        courses = course_service.get_all_courses(instructor_id=instructor_id)
         return jsonify(courses), 200
-    
+
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error":str(e)}), 500
 
 
 # Get specific course
