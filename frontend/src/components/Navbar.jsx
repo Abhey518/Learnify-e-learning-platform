@@ -84,9 +84,11 @@ export default function Navbar() {
                         Browse Courses
                 </Link>
             </li>
+
           </ul>
 
-          {/* Action Call Routing Block Container */}
+
+
           {/* Action Call Routing Block Container */}
           <div className="d-flex align-items-center gap-2 mt-2 mt-md-0">
             {user && user.logged_in ? (

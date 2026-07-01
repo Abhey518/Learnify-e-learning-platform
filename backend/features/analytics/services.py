@@ -192,18 +192,9 @@ def fetch_all_reviews():
 def get_all_instructors():
     try:
         response = supabase.table("profiles") \
-            .select("""
-                name,
-                email,
-                status,
-                resume_url,
-                created_at    
-"""
-            ) \
-            .eq("role", 'instructor') \
-            .order("created_at", desc=True) \
+            .select("id, name, email, created_at") \
+            .eq("role", "instructor") \
             .execute()
-        
         return {"success": True, "data": response.data}
     
     except Exception as e:
@@ -217,16 +208,9 @@ def get_all_instructors():
 def get_all_students():
     try:
         response = supabase.table("profiles") \
-            .select("""
-                name,
-                email,
-                created_at    
-"""
-            ) \
-            .eq("role", 'student' or '') \
-            .order("created_at", desc=True) \
+            .select("id, name, email, created_at") \
+            .eq("role", "student") \
             .execute()
-        
         return {"success": True, "data": response.data}
     
     except Exception as e:
