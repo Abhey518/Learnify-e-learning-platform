@@ -105,7 +105,33 @@ class CourseService:
 
     # Create a new lesson
     def create_lesson(self, lesson_data):
+
         # Insert a new lesson into the database
         # For Instructor
         response = self.supabase.table("lessons").insert(lesson_data).execute()
+        return response.data
+    
+
+    # Fetch all lessons for a module
+    def get_lessons_by_module(self, module_id):
+        
+        # Fetch lesson metadata only from the database
+        # For enrolled students or instructor
+        response = self.supabase.table("lessons").select("id, title, module_id, order_no").eq("module_id", module_id).order("order_no").execute()
+        return response.data
+
+    
+    # Fetch a single module by ID
+    def get_module_by_id(self, module_id):
+
+        # Fetch module details from the database
+        response = self.supabase.table("modules").select("*").eq("id", module_id).execute()
+        return response.data
+
+
+    # Check student enrollment in a course
+    def check_enrollment(self, student_id, course_id):
+
+        # Fetch enrollment record from the database
+        response = self.supabase.table("enrollments").select("*").eq("student_id", student_id).eq("course_id", course_id).execute()
         return response.data

@@ -256,3 +256,53 @@ def create_lesson():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+
+# Retrieve all lessons for a module (Enrolled Students or Instructor)
+@courses_bp.route('/modules/<module_id>/lessons', methods=['GET'])
+def get_module_lessons(module_id):
+    try:
+        # Get optional instructor ID query parameter
+        instructor_id = request.args.get('instructor_id')
+
+        # Get student ID query parameter
+        student_id = request.args.get('student_id')
+
+        # Fetch module details using service
+        module = course_service.get_module_by_id(module_id)
+
+        # Handle module not found
+        if not module:
+            return jsonify({"error": "Module not found"}), 404
+
+        # Extract course ID from module
+        course_id = module[0]["course_id"]
+
+        # Fetch course details using service
+        course = course_service.get_course_by_id(course_id, instructor_id=instructor_id)
+        
+        # Handle course not found
+        if not course:
+            return jsonify({"error": "Course not found"}), 404
+
+        # Check if the requester is the course instructor
+        is_instructor = instructor_id and str(instructor_id) == str(course[0]["instructor_id"])
+        
+        # If the requester is not the course instructor, verify student enrollment
+        if not is_instructor:
+            if not student_id:
+                return jsonify({"error": "Access Denied. Student ID is required."}), 403
+
+            # Check if the student has an active enrollment
+            enrollment = course_service.check_enrollment(student_id, course_id)
+            if not enrollment:
+                return jsonify({"error": "Access Denied. You must be enrolled to view lessons."}), 403
+
+        # Fetch lessons metadata from service
+        lessons = course_service.get_lessons_by_module(module_id)
+
+        # Return list of lessons
+        return jsonify(lessons), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
