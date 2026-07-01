@@ -174,3 +174,34 @@ def get_course_modules(course_id):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+# Modify an existing module by ID (Instructor Only)
+@courses_bp.route('/modules/<module_id>', methods=['PUT'])
+def update_module(module_id):
+    try:
+        # Get JSON request body
+        module_data = request.get_json(silent=True)
+
+        # Handle empty request body
+        if not module_data:
+            return jsonify({"error": "Request body is empty"}), 400
+
+        # Validate modification fields
+        from .validators import validate_module_update
+
+        if not validate_module_update(module_data):
+            return jsonify({"error": "No fields provided to update"}), 400
+
+        # Update module using service
+        module = course_service.update_module(module_id, module_data)
+
+        # Return updated module object
+        if module:
+            return jsonify(module[0]), 200
+
+        # Handle module not found
+        return jsonify({"error": "Module not found"}), 404
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

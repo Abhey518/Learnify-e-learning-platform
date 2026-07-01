@@ -83,3 +83,12 @@ class CourseService:
         # Fetch all modules of a course from the database
         response = self.supabase.table("modules").select("*").eq("course_id", course_id).order("order_no").execute()
         return response.data
+    
+
+    # Update a module by ID
+    def update_module(self, module_id, module_data):
+
+        # Update an existing module in the database
+        # For Instructor
+        response = self.supabase.table("modules").update(module_data).eq("id", module_id).execute()
+        return response.data
