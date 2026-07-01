@@ -92,3 +92,12 @@ class CourseService:
         # For Instructor
         response = self.supabase.table("modules").update(module_data).eq("id", module_id).execute()
         return response.data
+    
+
+    # Delete a module by ID
+    def delete_module(self, module_id):
+
+        # Delete an existing module from the database
+        # For Instructor
+        response = self.supabase.table("modules").delete().eq("id", module_id).execute()
+        return response.data

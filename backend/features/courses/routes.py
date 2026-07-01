@@ -205,3 +205,21 @@ def update_module(module_id):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+# Delete a module by ID (Instructor Only)
+@courses_bp.route('/modules/<module_id>', methods=['DELETE'])
+def delete_module(module_id):
+    try:
+        # Delete module using service
+        module = course_service.delete_module(module_id)
+
+        # Return success message
+        if module:
+            return jsonify({"message": "Module deleted successfully"}), 200
+
+        # Handle module not found
+        return jsonify({"error": "Module not found"}), 404
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
