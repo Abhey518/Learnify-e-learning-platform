@@ -9,11 +9,13 @@ course_service = CourseService() #initialize the service class
 @courses_bp.route('', methods=['GET'])
 def get_courses():
     try:
-        # Retrieve the optional instructor_id query parameter from the request URL
+        # Get optional instructor ID query parameter
         instructor_id = request.args.get('instructor_id')
 
-        # Fetch courses filtered by instructor ID or public published state
+        # Fetch courses from service
         courses = course_service.get_all_courses(instructor_id=instructor_id)
+
+        # Return list of courses
         return jsonify(courses), 200
 
     except Exception as e:
