@@ -1,19 +1,45 @@
+
 from flask import Blueprint, request, jsonify
 from .services import EnrollmentService
 
-enrollment_bp = Blueprint('enrollment', __name__, url_prefix='/api/enrollment')
+enrollment_bp = Blueprint(
+    "enrollment",
+    __name__,
+    url_prefix="/api/enrollment"
+)
 
-@enrollment_bp.route('', methods=['GET'])
-def get_enrollments():
-    # Get user enrollments
-    pass
+enrollment_service = EnrollmentService()
 
-@enrollment_bp.route('', methods=['POST'])
+# FR-2.1: Get Catalog
+@enrollment_bp.route("/catalog", methods=["GET"])
+def get_catalog():
+    try:
+        courses = enrollment_service.get_catalog()
+        return jsonify({"success": True, "courses": courses}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+
+# FR-2.2: Enroll Course
+@enrollment_bp.route("", methods=["POST"])
 def enroll_course():
-    # Enroll in a course
-    pass
+    try:
+        data = request.get_json(silent=True)
+        if not data:
+            return jsonify({"error": "Request body is empty"}), 400
 
-@enrollment_bp.route('/<enrollment_id>', methods=['DELETE'])
-def unenroll(enrollment_id):
-    # Unenroll from course
-    pass
+        student_id = data.get("student_id")
+        course_id = data.get("course_id")
+
+        if not student_id or not course_id:
+            return jsonify({"error": "Missing fields: student_id and course_id are required"}), 400
+
+        result = enrollment_service.enroll_user(student_id, course_id)
+        return jsonify({"message": "Enrollment successful", "data": result[0]}), 201
+
+    except ValueError as ve:
+        # Handles "Already enrolled" validation error cleanly
+        return jsonify({"error": str(ve)}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
