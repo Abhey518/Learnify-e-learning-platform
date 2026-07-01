@@ -145,3 +145,12 @@ class CourseService:
         response = self.supabase.table("lessons").update(lesson_data).eq("id", lesson_id).execute()
         return response.data
     
+
+    # Delete a lesson by ID
+    def delete_lesson(self, lesson_id):
+        
+        # Delete an existing lesson from the database
+        # For Instructor
+        response = self.supabase.table("lessons").delete().eq("id", lesson_id).execute()
+        return response.data
+    

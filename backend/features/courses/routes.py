@@ -338,3 +338,20 @@ def update_lesson(lesson_id):
         return jsonify({"error": str(e)}), 500
     
     
+# Delete a lesson by ID (Instructor Only)
+@courses_bp.route('/lessons/<lesson_id>', methods=['DELETE'])
+def delete_lesson(lesson_id):
+    try:
+        # Delete lesson using service
+        lesson = course_service.delete_lesson(lesson_id)
+
+        # Return success message
+        if lesson:
+            return jsonify({"message": "Lesson deleted successfully"}), 200
+
+        # Handle lesson not found
+        return jsonify({"error": "Lesson not found"}), 404
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
