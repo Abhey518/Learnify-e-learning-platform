@@ -22,11 +22,14 @@ class CourseService:
         response = query.execute()
         return response.data
 
+
     # Fetch course by ID
     def get_course_by_id(self, course_id):
        
+       # Run a select query filtered by course ID
        response = self.supabase.table('courses').select('*').eq('id', course_id).execute()
        return response.data
+
 
     # Create new course
     def create_course(self, course_data):
