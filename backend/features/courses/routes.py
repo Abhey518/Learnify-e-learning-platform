@@ -150,3 +150,27 @@ def create_module():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+# Retrieve all modules for a course (Public)
+@courses_bp.route('/<course_id>/modules', methods=['GET'])
+def get_course_modules(course_id):
+    try:
+        # Get optional instructor ID query parameter
+        instructor_id = request.args.get('instructor_id')
+
+        # Verify course is accessible to the caller
+        course = course_service.get_course_by_id(course_id, instructor_id=instructor_id)
+
+        # Handle course not found or not published
+        if not course:
+            return jsonify({"error": "Course not found"}), 404
+
+        # Fetch modules from service
+        modules = course_service.get_modules_by_course(course_id)
+
+        # Return list of modules
+        return jsonify(modules), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

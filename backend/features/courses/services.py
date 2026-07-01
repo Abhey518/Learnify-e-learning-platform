@@ -76,3 +76,10 @@ class CourseService:
         response = self.supabase.table("modules").insert(module_data).execute()
         return response.data
        
+
+    # Fetch all modules for a course
+    def get_modules_by_course(self, course_id):
+
+        # Fetch all modules of a course from the database
+        response = self.supabase.table("modules").select("*").eq("course_id", course_id).order("order_no").execute()
+        return response.data
