@@ -76,25 +76,27 @@ def create_course():
 @courses_bp.route('/<course_id>', methods=['PUT'])
 def update_course(course_id):
     try:
-        # Check if JSON data was sent
+        # Get JSON request body
         course_data = request.get_json(silent=True)
 
+        # Handle empty request body
         if not course_data:
             return jsonify({"error": "Request body is empty"}), 400
         
-        # Validate required fields
+        # Validate modification fields
         from .validators import validate_course_update
 
         if not validate_course_update(course_data):
             return jsonify({"error": "No fields provided to update"}), 400
         
-        # If valid, proceed to update in database
+        # Update course using service
         updated_course = course_service.update_course(course_id, course_data)
 
+        # Return updated course object
         if updated_course:
             return jsonify(updated_course[0]), 200
         
-        # If course was not found in the DB
+        # Handle course not found
         return jsonify({"error": "Failed to update course. Course not found"}), 404
     
     except Exception as e:

@@ -49,12 +49,16 @@ class CourseService:
         response = self.supabase.table("courses").insert(course_data).execute()
         return response.data
     
-    
-    # Update course
+
+    # Update a course by its unique ID
     def update_course(self, course_id, course_data):
-        
+
+        # Update an existing course in the database 
+        # Course publication -> Change visibility to student
+        # Course update -> Change course metadata
         response = self.supabase.table("courses").update(course_data).eq("id", course_id).execute()
         return response.data
+
 
     def delete_course(self, course_id):
         # Delete course
