@@ -114,7 +114,7 @@ class CourseService:
 
     # Fetch all lessons for a module
     def get_lessons_by_module(self, module_id):
-        
+
         # Fetch lesson metadata only from the database
         # For enrolled students or instructor
         response = self.supabase.table("lessons").select("id, title, module_id, order_no").eq("module_id", module_id).order("order_no").execute()
@@ -135,3 +135,13 @@ class CourseService:
         # Fetch enrollment record from the database
         response = self.supabase.table("enrollments").select("*").eq("student_id", student_id).eq("course_id", course_id).execute()
         return response.data
+    
+
+    # Update a lesson by ID
+    def update_lesson(self, lesson_id, lesson_data):
+        
+        # Update an existing lesson in the database
+        # For Instructor
+        response = self.supabase.table("lessons").update(lesson_data).eq("id", lesson_id).execute()
+        return response.data
+    

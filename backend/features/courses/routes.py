@@ -306,3 +306,35 @@ def get_module_lessons(module_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+
+# Modify an existing lesson by ID (Instructor Only)
+@courses_bp.route('/lessons/<lesson_id>', methods=['PUT'])
+def update_lesson(lesson_id):
+    try:
+        # Get JSON request body
+        lesson_data = request.get_json(silent=True)
+
+        # Handle empty request body
+        if not lesson_data:
+            return jsonify({"error": "Request body is empty"}), 400
+
+        # Validate modification fields
+        from .validators import validate_lesson_update
+
+        if not validate_lesson_update(lesson_data):
+            return jsonify({"error": "No fields provided to update"}), 400
+
+        # Update lesson using service
+        lesson = course_service.update_lesson(lesson_id, lesson_data)
+
+        # Return updated lesson object
+        if lesson:
+            return jsonify(lesson[0]), 200
+
+        # Handle lesson not found
+        return jsonify({"error": "Lesson not found"}), 404
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+    
