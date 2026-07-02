@@ -27,3 +27,34 @@ class ForumService:
             "course_id": thread_data.get('course_id')  # optional
         }).execute()
         return response.data[0] if response.data else response.data
+    
+    # --- GET THREAD POSTS LOGIC ---
+
+    def get_thread_posts(self, thread_id):
+        # get posts into specific threads 
+        response = self.supabase.table('forum_posts')\
+            .select('*')\
+            .eq('thread_id', thread_id)\
+            .execute()
+        return response.data
+
+# --- CREATE POST LOGIC ---
+
+    def create_post(self, post_data):
+        # insert new post into a thread
+        response = self.supabase.table('forum_posts').insert({
+            "thread_id": post_data.get('thread_id'),
+            "content": post_data.get('content'),
+            "user_id": post_data.get('user_id')
+        }).execute()
+        return response.data[0] if response.data else response.data
+
+# --- DELETE POST LOGIC ---
+
+    def delete_post(self, post_id):
+        # delete a post
+        response = self.supabase.table('forum_posts')\
+            .delete()\
+            .eq('id', post_id)\
+            .execute()
+        return response.data
