@@ -19,10 +19,10 @@ export default function LandingPage() {
               Your one-stop platform for online learning. Master new skills, earn recognized certifications, and learn from top-tier global experts at your own pace.
             </p>
             <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
-              <Link to="/register" className="btn text-white fw-semibold px-5 py-3 shadow" style={{ backgroundColor: '#6f42c1', borderRadius: '0.75rem' }}>
+              <Link to="/courses" className="btn text-white fw-semibold px-5 py-3 shadow" style={{ backgroundColor: '#6f42c1', borderRadius: '0.75rem' }}>
                 Explore Courses
               </Link>
-              <Link to="/login" className="btn btn-outline-secondary fw-semibold px-5 py-3" style={{ borderRadius: '0.75rem', borderColor: '#dee2e6', color: '#495057' }}>
+              <Link to="/" className="btn btn-outline-secondary fw-semibold px-5 py-3" style={{ borderRadius: '0.75rem', borderColor: '#dee2e6', color: '#495057' }}>
                 Watch Demo
               </Link>
             </div>
