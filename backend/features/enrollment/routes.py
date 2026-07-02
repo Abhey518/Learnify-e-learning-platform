@@ -55,3 +55,26 @@ def unenroll(enrollment_id):
         return jsonify({"message": "Enrollment deleted successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# FR-2.4: Fetch Secure Lesson Content
+@enrollment_bp.route("/lessons/<lesson_id>", methods=["GET"])
+def get_lesson(lesson_id):
+    try:
+        student_id = request.args.get("student_id")
+        if not student_id:
+            return jsonify({"error": "student_id is required as a query parameter"}), 400
+
+        result = enrollment_service.get_lesson_content(student_id, lesson_id)
+        if result is None:
+            return jsonify({"error": "Lesson not found"}), 404
+
+        return jsonify({"success": True, "lesson": result}), 200
+
+    except PermissionError as pe:
+        # Handles "Access Denied" error cleanly
+        return jsonify({"error": str(pe)}), 403
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+        
