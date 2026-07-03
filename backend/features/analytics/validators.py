@@ -2,7 +2,6 @@
 # Course Review Pipeline
 def validate_review_data(data):
     errors = {}
-
     course_id = data.get('course_id')
     rating = data.get('rating')
     comment = data.get('comment', '')
