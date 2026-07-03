@@ -77,28 +77,3 @@ def get_lesson(lesson_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-    
-    # FR-2.5 & FR-2.6: Track Progress
-@enrollment_bp.route("/progress", methods=["POST"])
-def track_progress():
-    try:
-        data = request.get_json(silent=True)
-        if not data:
-            return jsonify({"error": "Request body is empty"}), 400
-        student_id = data.get("student_id")
-        lesson_id = data.get("lesson_id")
-        is_completed = data.get("is_completed", True)
-        if not student_id or not lesson_id:
-            return jsonify({"error": "Missing fields: student_id and lesson_id are required"}), 400
-        result = enrollment_service.track_progress(student_id, lesson_id, is_completed)
-        return jsonify({"message": "Progress updated successfully", "data": result[0] if result else None}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-# GET /api/enrollment/progress/<student_id>/course/<course_id>
-@enrollment_bp.route("/progress/<student_id>/course/<course_id>", methods=["GET"])
-def get_course_progress(student_id, course_id):
-    try:
-        progress = enrollment_service.calculate_course_progress(student_id, course_id)
-        return jsonify({"success": True, "progress": progress}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
