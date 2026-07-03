@@ -19,8 +19,6 @@ def create_course_review(student_id, course_id, rating, comment):
             return {"success": False, "error": "You have already submitted a review for this course."}
         return {"success": False, "error": str(e)}
  
-            
-    
 
 def get_course_reviews_and_average(course_id):
     try:
@@ -49,6 +47,8 @@ def get_course_reviews_and_average(course_id):
     except Exception as e:
         return {"success": False, "error": str(e)}
     
+
+
 
 
 # Instructor Performance Metrics
@@ -118,7 +118,9 @@ def get_instructor_metrics(instructor_id, target_course_id=None):
 
 
 
-# Admin Platform Gatekeeper
+
+
+# Admin Platform Instructer and Student Management
 def get_pending_instructors():
     try:
         response = supabase.table("profiles") \
@@ -147,6 +149,30 @@ def update_instructor_status(user_id, status):
     except Exception as e:
         return {"success": False, "error": str(e)}
     
+
+def fetch_all_reviews():
+    try:
+        response = supabase.table("reviews") \
+            .select(
+                "id",
+                "rating",
+                "comment",
+                "created_at",
+                "course_id",
+                "student_id",
+                "profiles (name)"
+            ) \
+            .order("created_at", desc=True) \
+            .execute()
+            
+        return {"success": True, "data": response.data}
+        
+    except Exception as e:
+        print(f"Error fetching reviews with profiles: {str(e)}")
+        fallback = supabase.table("reviews").select("*").order("created_at", desc=True).execute()
+        return {"success": True, "data": fallback.data}
+
+
 def delete_review_by_admin(review_id):
     try:
         response = supabase.table("reviews") \
@@ -163,32 +189,8 @@ def delete_review_by_admin(review_id):
         return {"success": False, "error": str(e)}
 
 
-
-def fetch_all_reviews():
-    try:
-        response = supabase.table("reviews") \
-            .select("""
-                id,
-                rating,
-                comment,
-                created_at,
-                course_id,
-                student_id,
-                profiles (
-                    name
-                )
-            """) \
-            .order("created_at", desc=True) \
-            .execute()
-            
-        return {"success": True, "data": response.data}
-        
-    except Exception as e:
-        print(f"Error fetching reviews with profiles: {str(e)}")
-        fallback = supabase.table("reviews").select("*").order("created_at", desc=True).execute()
-        return {"success": True, "data": fallback.data}
     
-
+# Admin users controller
 def get_all_instructors():
     try:
         response = supabase.table("profiles") \
@@ -198,12 +200,9 @@ def get_all_instructors():
         return {"success": True, "data": response.data}
     
     except Exception as e:
-        print(f"Error fetching profiles with profiles: {str(e)}")
+        print(f"Error fetching instructors with profiles: {str(e)}")
         fallback = supabase.table("profiles").select("*").order("created_at", desc=True).execute()
         return {"success": True, "data": fallback.data}
-
-
-
 
 def get_all_students():
     try:
@@ -214,7 +213,7 @@ def get_all_students():
         return {"success": True, "data": response.data}
     
     except Exception as e:
-        print(f"Error fetching users with profiles: {str(e)}")
+        print(f"Error fetching students with profiles: {str(e)}")
         fallback = supabase.table("profiles").select("*").order("created_at", desc=True).execute()
         return {"success": True, "data": fallback.data}
     

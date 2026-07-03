@@ -8,7 +8,6 @@ def register_user(name, email, password, role, resume_url):
         if existing_user.data:
             return {"success": False, "status_code": 409, "error": "An account with this email already exists."}
         
-        # 2. Fire request directly to Supabase Auth engine
         auth_response = supabase.auth.sign_up({
             "email": email,
             "password": password,

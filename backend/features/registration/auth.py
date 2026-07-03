@@ -1,3 +1,5 @@
+# This code for authentication process Backup
+
 
 # from flask import Blueprint, request, jsonify, flash, session, redirect, url_for, render_template
 # from core.supabase_client import supabase

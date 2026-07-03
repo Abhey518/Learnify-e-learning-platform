@@ -49,14 +49,14 @@ def login():
         flash(result['error'], "error")
         return jsonify({"error": result['error']}), result['status_code']
 
-    # 3. Handle Flask Client State Session Management safely
+    # Handle Flask Client State Session Management
     session['user_id'] = result['user_id']
     session['name'] = result['name']
     session['user_role'] = result['role']
     session['user_status'] = result['status']
     session.permanent = True 
 
-    # 4. Generate system dashboard routing string redirections
+    # Generate system dashboard routing string redirections
     role = result['role']
     status = result['status']
     

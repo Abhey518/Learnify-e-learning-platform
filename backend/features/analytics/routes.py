@@ -85,21 +85,28 @@ def admin_delete_review(review_id):
 # Instructor Performance Metrics
 @analytics.route('/instructor/dashboard', methods=['GET'])
 def get_dashboard_analytics():
-    auth_error = verify_supabase_token()
-    if auth_error:
-        return auth_error
+    user_id = session.get('user_id')
+    user_role = session.get('user_role')
+
+    if not user_id:
+        return jsonify({"error": "Unauthenticated: No active session found."}), 401
     
-    if g.user_role not in ['instructor', 'admin']:
-        return jsonify({"error": "Access Denied: Only instructors can access this reporting view."}), 403
-    
-    is_valid, validation_errors = validate_dashboard_filters(request.args)
-    if not is_valid:
-        return jsonify({"errors": validation_errors}), 400
+    if user_role not in ['instructor', 'admin']:
+        return jsonify({"error": "Access Denied: Only the Instructor and Administrators can access this reporting view."}), 403
     
     target_course = request.args.get('course_id')
+    requested_instructor_id = request.args.get('instructor_id')
 
+    if user_role == 'instructor':
+        instructor_id = user_id
+    else:
+        instructor_id = requested_instructor_id if requested_instructor_id else user_id
+
+    if not instructor_id:
+        return jsonify({"error": "Bad Request: Missing target instructor_id parameter."}), 400
+    
     result = get_instructor_metrics(
-        instructor_id=g.user_id,
+        instructor_id=instructor_id,
         target_course_id=int(target_course) if target_course else None
     )
 
@@ -109,7 +116,7 @@ def get_dashboard_analytics():
     return jsonify(result), 200
 
 
-# Admin Platform Gatekeeper
+# Admin Platform Instructer and Student Management
 @analytics.route('/admin/pending-instructors', methods=['GET'])
 def list_pending_instructors():
     user_id = session.get('user_id')
@@ -134,11 +141,10 @@ def list_pending_instructors():
 
 @analytics.route('/admin/process-instructor', methods=['PUT'])
 def process_instructor():
-    auth_error = verify_supabase_token()
-    if auth_error:
-        return auth_error
-    
-    if g.user_role != 'admin':
+    user_id = session.get('user_id')
+    user_role = session.get('user_role')
+
+    if not user_id or user_role != 'admin':
         return jsonify({"error": "Access Denied: Administrative privileges required."}), 403
     
     data = request.get_json() or {}
@@ -171,7 +177,7 @@ def process_instructor():
 
 
 
-
+# Admin user controller
 @analytics.route('/admin/students', methods=['GET'])
 def admin_get_students():
     user_id = session.get('user_id')
@@ -225,7 +231,7 @@ def admin_delete_student(id):
     if not result['success']:
         return jsonify({"error": result['error']}), 400
 
-    return jsonify({"message": "Review deleted successfully by administrator moderation override."}), 200
+    return jsonify({"message": "Student Account deleted successfully by administrator moderation override."}), 200
 
 
 
@@ -244,4 +250,4 @@ def admin_delete_instructors(id):
     if not result['success']:
         return jsonify({"error": result['error']}), 400
 
-    return jsonify({"message": "Review deleted successfully by administrator moderation override."}), 200
+    return jsonify({"message": "Instructor Account deleted successfully by administrator moderation override."}), 200
