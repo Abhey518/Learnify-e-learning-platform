@@ -1,15 +1,33 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
+from core.decorators import login_required, role_required
 from .services import CourseService
+
+from .validators import (
+    validate_course,
+    validate_course_update,
+    validate_module,
+    validate_module_update,
+    validate_lesson,
+    validate_lesson_update,
+)
 
 courses_bp = Blueprint('courses', __name__, url_prefix='/api/courses')
 course_service = CourseService() #initialize the service class
+
+
+# Helper function to get user context
+def _actor_context():
+    user_id = session.get('user_id')
+    user_role = session.get('user_role')
+    instructor_id = user_id if user_role == 'instructor' else None
+    return user_id, user_role, instructor_id
 
 # Retrieve all courses (Public)
 @courses_bp.route('', methods=['GET'])
 def get_courses():
     try:
-        # Get optional instructor ID query parameter
-        instructor_id = request.args.get('instructor_id')
+        # Get user context
+        _, _, instructor_id = _actor_context()
 
         # Fetch courses from service
         courses = course_service.get_all_courses(instructor_id=instructor_id)
@@ -25,8 +43,8 @@ def get_courses():
 @courses_bp.route('/<course_id>', methods=['GET'])
 def get_course(course_id):
     try:
-        # Get optional instructor ID query parameter
-        instructor_id = request.args.get('instructor_id')
+        # Get user context
+        _, _, instructor_id = _actor_context()
 
         # Fetch course from service
         course = course_service.get_course_by_id(course_id, instructor_id=instructor_id)
@@ -44,6 +62,7 @@ def get_course(course_id):
 
 # Create a new course (Instructor Only)
 @courses_bp.route('', methods=['POST'])
+@role_required(['instructor'])
 def create_course():
     try:
         # Get JSON request body
@@ -53,11 +72,12 @@ def create_course():
         if not course_data:
             return jsonify({"error": "Request body is empty"}), 400
         
+        # Inject authenticated instructor ID into the payload
+        course_data['instructor_id'] = session.get('user_id')
+        
         # Validate required fields
-        from .validators import validate_course
-
         if not validate_course(course_data):
-            return jsonify({"error": "Missing required fields: title, description, or instructor_id"}), 400
+            return jsonify({"error": "Missing required fields: title or description"}), 400
         
         # Create course using service
         course = course_service.create_course(course_data)
@@ -75,8 +95,13 @@ def create_course():
 
 # Update course (Instructor Only)
 @courses_bp.route('/<course_id>', methods=['PUT'])
+@role_required(['instructor'])
 def update_course(course_id):
     try:
+        # Verify instructor ownership before applying changes
+        if not course_service.is_course_owner(course_id, session.get('user_id')):
+            return jsonify({"error": "Access Denied. Instructor can modify only owned courses."}), 403
+
         # Get JSON request body
         course_data = request.get_json(silent=True)
 
@@ -85,8 +110,6 @@ def update_course(course_id):
             return jsonify({"error": "Request body is empty"}), 400
         
         # Validate modification fields
-        from .validators import validate_course_update
-
         if not validate_course_update(course_data):
             return jsonify({"error": "No fields provided to update"}), 400
         
@@ -106,8 +129,13 @@ def update_course(course_id):
 
 # Delete course (Instructor Only)
 @courses_bp.route('/<course_id>', methods=['DELETE'])
+@role_required(['instructor'])
 def delete_course(course_id):
     try:
+        # Verify instructor ownership before removal
+        if not course_service.is_course_owner(course_id, session.get('user_id')):
+            return jsonify({"error": "Access Denied. Instructor can remove only owned courses."}), 403
+
         # Delete course using service
         course = course_service.delete_course(course_id)
         
@@ -124,6 +152,7 @@ def delete_course(course_id):
 
 # Create a new module (Instructor Only)
 @courses_bp.route('/modules', methods=['POST'])
+@role_required(['instructor'])
 def create_module():
     try:
         # Get JSON request body
@@ -134,10 +163,12 @@ def create_module():
             return jsonify({"error": "Request body is empty"}), 400
 
         # Validate required fields
-        from .validators import validate_module
-
         if not validate_module(module_data):
             return jsonify({"error": "Missing required fields: course_id, title, or order_no"}), 400
+        
+        # Verify instructor ownership before creation
+        if not course_service.is_course_owner(module_data['course_id'], session.get('user_id')):
+            return jsonify({"error": "Access Denied. Instructor can create modules only under owned courses."}), 403
         
         # Create module using service
         module = course_service.create_module(module_data)
@@ -157,8 +188,8 @@ def create_module():
 @courses_bp.route('/<course_id>/modules', methods=['GET'])
 def get_course_modules(course_id):
     try:
-        # Get optional instructor ID query parameter
-        instructor_id = request.args.get('instructor_id')
+        # Get user context
+        _, _, instructor_id = _actor_context()
 
         # Verify course is accessible to the caller
         course = course_service.get_course_by_id(course_id, instructor_id=instructor_id)
@@ -179,8 +210,18 @@ def get_course_modules(course_id):
 
 # Modify an existing module by ID (Instructor Only)
 @courses_bp.route('/modules/<module_id>', methods=['PUT'])
+@role_required(['instructor'])
 def update_module(module_id):
     try:
+        # Get module details
+        module = course_service.get_module_by_id(module_id)
+        if not module:
+            return jsonify({"error": "Module not found"}), 404
+        
+        # Verify instructor ownership before modification
+        if not course_service.is_course_owner(module[0]['course_id'], session.get('user_id')):
+            return jsonify({"error": "Access Denied. Instructor can modify only owned modules."}), 403
+
         # Get JSON request body
         module_data = request.get_json(silent=True)
 
@@ -189,8 +230,6 @@ def update_module(module_id):
             return jsonify({"error": "Request body is empty"}), 400
 
         # Validate modification fields
-        from .validators import validate_module_update
-
         if not validate_module_update(module_data):
             return jsonify({"error": "No fields provided to update"}), 400
 
@@ -210,8 +249,18 @@ def update_module(module_id):
 
 # Delete a module by ID (Instructor Only)
 @courses_bp.route('/modules/<module_id>', methods=['DELETE'])
+@role_required(['instructor'])
 def delete_module(module_id):
     try:
+        # Get module details
+        module = course_service.get_module_by_id(module_id)
+        if not module:
+            return jsonify({"error": "Module not found"}), 404
+
+        # Verify instructor ownership before deletion
+        if not course_service.is_course_owner(module[0]['course_id'], session.get('user_id')):
+            return jsonify({"error": "Access Denied. Instructor can delete only owned modules."}), 403
+
         # Delete module using service
         module = course_service.delete_module(module_id)
 
@@ -228,6 +277,7 @@ def delete_module(module_id):
 
 # Create a new lesson (Instructor Only)
 @courses_bp.route('/lessons', methods=['POST'])
+@role_required(['instructor'])
 def create_lesson():
     try:
         # Get JSON request body
@@ -238,10 +288,16 @@ def create_lesson():
             return jsonify({"error": "Request body is empty"}), 400
 
         # Validate required fields
-        from .validators import validate_lesson
-
         if not validate_lesson(lesson_data):
             return jsonify({"error": "Missing required fields: module_id, title, or order_no"}), 400
+        
+         # Verify module ownership before creation
+        module = course_service.get_module_by_id(lesson_data['module_id'])
+        if not module:
+            return jsonify({"error": "Module not found"}), 404
+        
+        if not course_service.is_course_owner(module[0]['course_id'], session.get('user_id')):
+            return jsonify({"error": "Access Denied. Instructor can create lessons only under owned modules."}), 403
 
         # Create lesson using service
         lesson = course_service.create_lesson(lesson_data)
@@ -259,13 +315,11 @@ def create_lesson():
 
 # Retrieve all lessons for a module (Enrolled Students or Instructor)
 @courses_bp.route('/modules/<module_id>/lessons', methods=['GET'])
+@login_required
 def get_module_lessons(module_id):
     try:
-        # Get optional instructor ID query parameter
-        instructor_id = request.args.get('instructor_id')
-
-        # Get student ID query parameter
-        student_id = request.args.get('student_id')
+        # Get user context from session
+        user_id, user_role, _ = _actor_context()
 
         # Fetch module details using service
         module = course_service.get_module_by_id(module_id)
@@ -278,24 +332,21 @@ def get_module_lessons(module_id):
         course_id = module[0]["course_id"]
 
         # Fetch course details using service
-        course = course_service.get_course_by_id(course_id, instructor_id=instructor_id)
+        course = course_service.get_course_by_id(course_id, instructor_id=user_id if user_role == 'instructor' else None)
         
         # Handle course not found
         if not course:
             return jsonify({"error": "Course not found"}), 404
 
         # Check if the requester is the course instructor
-        is_instructor = instructor_id and str(instructor_id) == str(course[0]["instructor_id"])
+        is_instructor = user_role == 'instructor' and str(user_id) == str(course[0]["instructor_id"])
         
         # If the requester is not the course instructor, verify student enrollment
         if not is_instructor:
-            if not student_id:
-                return jsonify({"error": "Access Denied. Student ID is required."}), 403
-
             # Check if the student has an active enrollment
-            enrollment = course_service.check_enrollment(student_id, course_id)
+            enrollment = course_service.check_enrollment(user_id, course_id)
             if not enrollment:
-                return jsonify({"error": "Access Denied. You must be enrolled to view lessons."}), 403
+                return jsonify({"error": "Access Denied. Enrollment in this course is required to view lessons."}), 403
 
         # Fetch lessons metadata from service
         lessons = course_service.get_lessons_by_module(module_id)
@@ -309,8 +360,23 @@ def get_module_lessons(module_id):
 
 # Modify an existing lesson by ID (Instructor Only)
 @courses_bp.route('/lessons/<lesson_id>', methods=['PUT'])
+@role_required(['instructor'])
 def update_lesson(lesson_id):
     try:
+        # Get lesson details
+        lesson = course_service.get_lesson_by_id(lesson_id)
+        if not lesson:
+            return jsonify({"error": "Lesson not found"}), 404
+        
+        # Get module details
+        module = course_service.get_module_by_id(lesson[0]['module_id'])
+        if not module:
+            return jsonify({"error": "Module not found"}), 404
+        
+        # Verify instructor ownership before modification
+        if not course_service.is_course_owner(module[0]['course_id'], session.get('user_id')):
+            return jsonify({"error": "Access Denied. Instructor can modify only owned lessons."}), 403
+
         # Get JSON request body
         lesson_data = request.get_json(silent=True)
 
@@ -319,8 +385,6 @@ def update_lesson(lesson_id):
             return jsonify({"error": "Request body is empty"}), 400
 
         # Validate modification fields
-        from .validators import validate_lesson_update
-
         if not validate_lesson_update(lesson_data):
             return jsonify({"error": "No fields provided to update"}), 400
 
@@ -340,8 +404,23 @@ def update_lesson(lesson_id):
     
 # Delete a lesson by ID (Instructor Only)
 @courses_bp.route('/lessons/<lesson_id>', methods=['DELETE'])
+@role_required(['instructor'])
 def delete_lesson(lesson_id):
     try:
+        # Get lesson details
+        lesson = course_service.get_lesson_by_id(lesson_id)
+        if not lesson:
+            return jsonify({"error": "Lesson not found"}), 404
+
+        # Get module details
+        module = course_service.get_module_by_id(lesson[0]['module_id'])
+        if not module:
+            return jsonify({"error": "Module not found"}), 404
+
+        # Verify instructor ownership before removal
+        if not course_service.is_course_owner(module[0]['course_id'], session.get('user_id')):
+            return jsonify({"error": "Access Denied. Instructor can remove only owned lessons."}), 403
+
         # Delete lesson using service
         lesson = course_service.delete_lesson(lesson_id)
 

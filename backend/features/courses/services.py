@@ -1,8 +1,8 @@
-from core.supabase_client import get_supabase_client
+from core.supabase_client import supabase
 
 class CourseService:
     def __init__(self):
-        self.supabase = get_supabase_client()
+        self.supabase = supabase
 
     # Fetch all courses
     def get_all_courses(self, instructor_id=None):
@@ -41,6 +41,13 @@ class CourseService:
         response = query.execute()
         return response.data
 
+
+    # Verify whether an instructor owns a course
+    def is_course_owner(self, course_id, instructor_id):
+
+        response = self.supabase.table("courses").select("id").eq("id", course_id).eq("instructor_id", instructor_id).execute()
+        return bool(response.data)
+    
        
     # Create a new course
     def create_course(self, course_data):
@@ -84,6 +91,14 @@ class CourseService:
         response = self.supabase.table("modules").select("*").eq("course_id", course_id).order("order_no").execute()
         return response.data
     
+    
+    # Fetch a single module by ID
+    def get_module_by_id(self, module_id):
+
+        # Fetch module details from the database
+        response = self.supabase.table("modules").select("*").eq("id", module_id).execute()
+        return response.data
+    
 
     # Update a module by ID
     def update_module(self, module_id, module_data):
@@ -120,12 +135,11 @@ class CourseService:
         response = self.supabase.table("lessons").select("id, title, module_id, order_no").eq("module_id", module_id).order("order_no").execute()
         return response.data
 
-    
-    # Fetch a single module by ID
-    def get_module_by_id(self, module_id):
 
-        # Fetch module details from the database
-        response = self.supabase.table("modules").select("*").eq("id", module_id).execute()
+    # Fetch a single lesson by ID
+    def get_lesson_by_id(self, lesson_id):
+
+        response = self.supabase.table("lessons").select("id, module_id").eq("id", lesson_id).execute()
         return response.data
 
 
