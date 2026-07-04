@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Route } from 'react-router-dom';
 import QuizListPage from './pages/QuizListPage';
 import QuizPage from './pages/QuizPage';
@@ -8,3 +9,15 @@ const quizRoutes = [
 ];
 
 export default quizRoutes;
+=======
+import { Route } from 'react-router-dom'
+
+// Import pages
+// import QuizListPage from './pages/QuizListPage'
+// import QuizPage from './pages/QuizPage'
+
+export default [
+  // <Route path="/quizzes" element={<QuizListPage />} />,
+  // <Route path="/quizzes/:id" element={<QuizPage />} />,
+]
+>>>>>>> 4ed59a1d7d2d56524150966236754f09e65a4059

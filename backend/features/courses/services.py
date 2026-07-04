@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 from backend.core.supabase_client import get_supabase_client
+=======
+from ...core.supabase_client import get_supabase_client
+>>>>>>> 4ed59a1d7d2d56524150966236754f09e65a4059
 
 class CourseService:
     def __init__(self):

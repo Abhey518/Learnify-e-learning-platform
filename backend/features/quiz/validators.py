@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 def validate_quiz_template(data):
     """Quiz එකක් සෑදීමට අවශ්‍ය දත්ත තිබේදැයි බලයි."""
     if not data or not data.get("title"):
@@ -15,3 +16,12 @@ def validate_question(data):
             return False, f"Field '{field}' is required."
     return True, None
 
+=======
+def validate_quiz_submission(data):
+    required_fields = ['quiz_id', 'user_id', 'answers']
+    return all(field in data for field in required_fields)
+
+def validate_answers(answers):
+    # Validate quiz answers format
+    return isinstance(answers, list) and len(answers) > 0
+>>>>>>> 4ed59a1d7d2d56524150966236754f09e65a4059
