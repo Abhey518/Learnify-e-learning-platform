@@ -1,8 +1,8 @@
-from core.supabase_client import get_supabase_client
+from core.supabase_client import supabase
 
 class QuizService:
     def __init__(self):
-        self.supabase = get_supabase_client()
+        self.supabase = supabase
 
     def get_all_quizzes(self, course_id=None):
         # Get all quizzes, optionally filtered by course

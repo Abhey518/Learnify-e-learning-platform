@@ -1,9 +1,8 @@
-from core.supabase_client import get_supabase_client
+from core.supabase_client import supabase
 
 class ForumService:
     def __init__(self):
-        # initialize Supabase client
-        self.supabase = get_supabase_client()
+        self.supabase = supabase
 
 # --- GET THREADS LOGIC ---
 
