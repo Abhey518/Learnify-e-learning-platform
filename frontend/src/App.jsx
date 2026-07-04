@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute'
+import NotFoundPage from './components/NotFoundPage';
 
 import RegisterPage from './features/registration/RegisterPage';
 import LoginPage from './features/registration/LoginPage';
@@ -11,15 +12,17 @@ import CoursesPage from './features/courses/CoursesPage';
 import AdminDashboardPage from './features/analytics/AdminDashboardPage';
 import SubmitReviewForm from './features/analytics/SubmitReviewForm';
 import CourseReviewsSection from './components/CourseReviewsSection';
+import InstructorAnalyticsPage from './features/analytics/InstructorAnalyticsPage';
+import InstructorPendingPage from './features/registration/InstructorPendingPage';
+
 
 
 export default function App() {
   return (
     <Router>
-      {/* 1. Global Navigation Bar sits perfectly at the top edge of every public view */}
+      {/* Global Navigation Bar */}
       <Navbar />
 
-      {/* 2. Main content area with a 72px padding top offset to prevent navbar overlap */}
       <main style={{ minHeight: '100vh', paddingTop: '72px', backgroundColor: '#f8f9fa' }}>
         <Routes>
           {/* Public Platform Core Pages */}
@@ -30,8 +33,15 @@ export default function App() {
           <Route path="/submit-review" element={<SubmitReviewForm />} />
           <Route path="/course-reviews/:courseId" element={<CourseReviewsSection />} />
 
-          {/* Catch-all Fallback Safety Routing Block */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+
+          
+
+
+
+          <Route path="*" element={<NotFoundPage />} />
+
+
+
 
 
           <Route 
@@ -40,8 +50,26 @@ export default function App() {
             <ProtectedRoute allowedRole="admin">
               <AdminDashboardPage />
             </ProtectedRoute>
+          } />
+          <Route path="/instructor-analytics" element={
+            <ProtectedRoute allowedRole="admin">
+              <InstructorAnalyticsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/instructor-analytics" element={
+            <ProtectedRoute allowedRole="instructor">
+              <InstructorAnalyticsPage />
+            </ProtectedRoute>
+          } />
+          <Route 
+          path="/dashboard/instructor/pending" 
+          element={
+            <ProtectedRoute allowedRole="pending_instructor">
+              <InstructorPendingPage />
+            </ProtectedRoute>
           } 
         />
+
 
 
 

@@ -21,9 +21,6 @@ def validate_signup_data(data):
 
 
 def validate_login_data(data):
-    """
-    Validates standard parameter presence for logging in.
-    """
     if not data.get('email') or not data.get('password'):
         return False, "Email and password fields are required."
     return True, None

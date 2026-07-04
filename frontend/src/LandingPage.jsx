@@ -4,11 +4,9 @@ export default function LandingPage() {
   return (
     <div className="bg-light min-vh-100 d-flex flex-column">
       
-      {/* 2. Hero Section */}
       <header className="container my-auto py-5">
         <div className="row align-items-center justify-content-center">
           <div className="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
-            {/* Scaled 3x Mortarboard Icon */}
             <div className="mb-3 d-inline-block">
               <i className="bi bi-mortarboard-fill" style={{ color: '#6f42c1', fontSize: '4.5rem' }}></i>
             </div>
@@ -22,13 +20,12 @@ export default function LandingPage() {
               <Link to="/courses" className="btn text-white fw-semibold px-5 py-3 shadow" style={{ backgroundColor: '#6f42c1', borderRadius: '0.75rem' }}>
                 Explore Courses
               </Link>
-              <Link to="/" className="btn btn-outline-secondary fw-semibold px-5 py-3" style={{ borderRadius: '0.75rem', borderColor: '#dee2e6', color: '#495057' }}>
+              <Link to="/demo" className="btn btn-outline-secondary fw-semibold px-5 py-3" style={{ borderRadius: '0.75rem', borderColor: '#dee2e6', color: '#495057' }}>
                 Watch Demo
               </Link>
             </div>
           </div>
 
-          {/* 3. Hero Visual / Action Card */}
           <div className="col-md-8 col-lg-5 offset-lg-1">
             <div className="card p-5 shadow-lg border-0 text-center bg-white" style={{ borderRadius: '1.5rem' }}>
               <div className="bg-light p-4 rounded-4 mb-4 text-center">
@@ -52,7 +49,7 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* 4. Features Grid Section */}
+
       <section className="bg-white py-5 border-top">
         <div className="container py-4">
           <div className="text-center mb-5">
@@ -85,7 +82,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 5. Simple Footer */}
       <footer className="bg-dark text-light py-4 mt-auto">
         <div className="container text-center">
           <p className="mb-0 small text-white-50">&copy; {new Date().getFullYear()} Learnify Inc. All rights reserved.</p>
