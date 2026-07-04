@@ -93,7 +93,7 @@ def submit_quiz(quiz_id):
             "detail": "Check your Python backend terminal for full traceback logs."
         })
         return add_cors_headers(response, "POST"), 500
-=======
+
 from flask import Blueprint, request, jsonify
 from .services import QuizService
 
