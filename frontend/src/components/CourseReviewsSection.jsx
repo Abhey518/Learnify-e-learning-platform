@@ -20,7 +20,6 @@ export default function CourseReviewsSection({ courseId }) {
         return res.json();
       })
       .then((data) => {
-        // Expecting { success: true, reviews: [...], average_rating: X, total_reviews: Y }
         setReviews(data.reviews || []);
         
         // Calculate or map ratings distribution for the progress bars
@@ -61,15 +60,14 @@ export default function CourseReviewsSection({ courseId }) {
     <div className="bg-white rounded-3 shadow-sm p-4 text-dark text-start border">
       <h3 className="fw-bold mb-4 h4 text-dark">Student Feedback</h3>
 
-      {/* Summary Matrix Top Grid */}
+
       <div className="row g-4 align-items-center mb-5">
-        {/* Left Big Badge Score */}
         <div className="col-12 col-md-4 text-center border-end border-md-end-none">
           <h4 className="display-3 fw-bold mb-0" style={{ color: '#6f42c1' }}>
             {metrics.average_rating.toFixed(1)}
           </h4>
           <div className="text-warning fs-4 my-1">
-            {/* Generate static stars representing the average rating score rounded */}
+
             {[1, 2, 3, 4, 5].map((star) => (
               <i 
                 key={star} 
@@ -80,7 +78,6 @@ export default function CourseReviewsSection({ courseId }) {
           <p className="text-muted small mb-0">Course Rating ({metrics.total_reviews} reviews)</p>
         </div>
 
-        {/* Right Distribution Progress Bars */}
         <div className="col-12 col-md-8">
           {[5, 4, 3, 2, 1].map((stars) => {
             const count = metrics.distribution[stars] || 0;
@@ -112,7 +109,6 @@ export default function CourseReviewsSection({ courseId }) {
 
       <hr className="text-muted opacity-25 my-4" />
 
-      {/* Individual Review Comments Grid */}
       <h4 className="fw-bold text-dark h5 mb-3">All Reviews ({reviews.length})</h4>
       
       {reviews.length > 0 ? (

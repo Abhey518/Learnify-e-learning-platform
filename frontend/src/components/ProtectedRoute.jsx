@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 
-export default function ProtectedRoute({ children, allowedRole }) {
+export default function ProtectedRoute({ children, allowedRole, allowedRoles }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const baseUrl = import.meta.env.VITE_API_URL || '/api';
 
   useEffect(() => {
-    // Ping your Flask backend session to get current logged-in user state
     fetch(`${baseUrl}/auth/current-user`, { credentials: 'include' })
       .then((res) => {
         if (!res.ok) throw new Error("Unauthenticated");
         return res.json();
       })
       .then((data) => {
-        setUser(data); // data has: { user_id, role, status, name }
+        setUser(data);
       })
       .catch(() => {
         setUser(null);
@@ -30,6 +29,11 @@ export default function ProtectedRoute({ children, allowedRole }) {
       </div>
     );
   }
+
+  if (user.status === 'pending') {
+    user.role = 'pending_instructor';
+  }
+
   if (!user) {
     return <Navigate to="/login" replace />;
   }
