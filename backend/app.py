@@ -3,6 +3,7 @@ from flask import Flask
 from flask_cors import CORS
 from features.registration.routes import auth
 from features.analytics.routes import analytics
+from features.courses.routes import courses_bp
 
 
 app = Flask(__name__)
@@ -12,6 +13,8 @@ app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', 'dev-fallback-key-
 
 app.register_blueprint(auth, url_prefix='/api/auth')
 app.register_blueprint(analytics, url_prefix='/api')
+app.register_blueprint(courses_bp)
+
 
 @app.route('/health', methods=['GET'])
 def health_check():

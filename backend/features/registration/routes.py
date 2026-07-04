@@ -61,11 +61,11 @@ def login():
     status = result['status']
     
     if role == 'instructor':
-        redirect_url = "/dashboard/instructor/pending" if status == 'pending' else "/dashboard/instructor"
+        redirect_url = "/dashboards/instructor/pending" if status == 'pending' else "/dashboards/instructor"
     elif role == 'admin':
         redirect_url = "/admin"
     else:
-        redirect_url = "/dashboard/student"
+        redirect_url = "/dashboards/student"
 
     flash(f"Welcome back! Logged in successfully.", "success")
     return jsonify({

@@ -122,8 +122,8 @@ export default function Navbar() {
                     <Link 
                       className="dropdown-item py-2 small rounded-2 fw-medium text-dark d-flex align-items-center" 
                       to={
-                        user.role === 'instructor' ? '/dashboard/instructor' : 
-                        user.role === 'admin' ? '/admin' : '/dashboard/student'
+                        user.role === 'instructor' ? '/dashboards/instructor' : 
+                        user.role === 'admin' ? '/admin' : '/dashboards/student'
                       }
                     >
                       <i className="bi bi-speedometer2 me-2 text-secondary"></i> My Dashboard

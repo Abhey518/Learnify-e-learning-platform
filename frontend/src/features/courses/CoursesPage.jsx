@@ -11,7 +11,7 @@ export default function CoursesPage() {
   useEffect(() => {
     const baseUrl = import.meta.env.VITE_API_URL || '/api';
     
-    fetch(`${baseUrl}/auth/courses`) // Adjust targeting endpoint if registered under a different blueprint
+    fetch(`${baseUrl}/courses`) // Adjust targeting endpoint if registered under a different blueprint
       .then((res) => {
         if (!res.ok) throw new Error("Could not fetch system courses data.");
         return res.json();
@@ -41,10 +41,10 @@ export default function CoursesPage() {
   const filteredCourses = safeCoursesArray.filter((course) => {
     // Safety check to ensure the course object properties exist before running string lookups
     const courseTitle = course?.title ? course.title.toLowerCase() : '';
-    const courseDesc = course?.description ? course.description.toLowerCase() : '';
+    // const courseDesc = course?.description ? course.description.toLowerCase() : '';
     const query = searchTerm.toLowerCase();
 
-    return courseTitle.includes(query) || courseDesc.includes(query);
+    return courseTitle.includes(query);
   });
 
   return (
@@ -119,7 +119,7 @@ export default function CoursesPage() {
                           {course.price && course.price > 0 ? `$${course.price}` : 'Free'}
                         </span>
                         <button className="btn btn-sm text-white px-3 fw-medium rounded-pill" style={{ backgroundColor: '#6f42c1' }}>
-                          View Class
+                          Enroll Now 
                         </button>
                       </div>
                     </div>
