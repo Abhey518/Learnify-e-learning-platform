@@ -28,7 +28,7 @@ export default function SubmitReviewForm({ courseId, courseTitle, onReviewSubmit
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(payload),
-      credentials: 'include' // Enforces your session login validation check
+      credentials: 'include'
     })
 
     .then(async (res) => {
@@ -44,7 +44,6 @@ export default function SubmitReviewForm({ courseId, courseTitle, onReviewSubmit
         setComment('');
         setRating(5);
         
-        // Triggers parent callback if provided to refresh layout arrays instantly
         if (onReviewSubmitted) {
           onReviewSubmitted(data.review);
         }
@@ -64,7 +63,6 @@ export default function SubmitReviewForm({ courseId, courseTitle, onReviewSubmit
           Reviewing: <span className="fw-semibold text-dark">{courseTitle || `Course #${courseId}`}</span>
         </p>
 
-        {/* Informational Status Feedbacks */}
         {success && (
           <div className="alert alert-success text-center small shadow-sm mb-4" role="alert">
             <i className="bi bi-check-circle-fill me-2"></i> {success}
@@ -79,7 +77,7 @@ export default function SubmitReviewForm({ courseId, courseTitle, onReviewSubmit
 
         <form onSubmit={handleSubmit}>
           
-          {/* Interactive Dynamic Star Selection Matrix */}
+
           <div className="mb-4">
             <label className="form-label fw-medium text-secondary small d-block mb-2">
               Your Rating Selection
