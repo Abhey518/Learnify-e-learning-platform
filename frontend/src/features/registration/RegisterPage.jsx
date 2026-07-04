@@ -76,7 +76,7 @@ export default function SignUp() {
 
               <form onSubmit={handleSubmit}>
                 
-                {/* 1. Account Tier Dropdown Selection */}
+                {/* Account Tier Dropdown Selection */}
                 <div className="mb-3 text-start">
                   <label className="form-label small fw-semibold text-secondary mb-1">Account Type</label>
                   <div className="input-group">
@@ -117,7 +117,7 @@ export default function SignUp() {
                   </div>
                 </div>
 
-                {/* 3. Email Input */}
+                {/* Email Input */}
                 <div className="mb-3 text-start">
                   <label className="form-label small fw-semibold text-secondary mb-1">Email Address</label>
                   <div className="input-group">
@@ -137,7 +137,7 @@ export default function SignUp() {
                   </div>
                 </div>
 
-                {/* 4. Password Input */}
+                {/* Password Input */}
                 <div className="mb-3 text-start">
                   <label className="form-label small fw-semibold text-secondary mb-1">Password</label>
                   <div className="input-group">
@@ -157,7 +157,7 @@ export default function SignUp() {
                   </div>
                 </div>
 
-                {/* 5. Conditional Instructor Resume Field */}
+                {/* Conditional Instructor Resume Field */}
                 {formData.role === 'instructor' && (
                   <div className="mb-3 text-start">
                     <label className="form-label small fw-semibold text-secondary mb-1">Resume Link</label>
