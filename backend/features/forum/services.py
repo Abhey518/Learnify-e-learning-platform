@@ -1,29 +1,59 @@
-<<<<<<< HEAD
-from backend.core.supabase_client import get_supabase_client
-=======
-from ...core.supabase_client import get_supabase_client
->>>>>>> 4ed59a1d7d2d56524150966236754f09e65a4059
+from core.supabase_client import supabase
 
 class ForumService:
     def __init__(self):
-        self.supabase = get_supabase_client()
+        self.supabase = supabase
+
+# --- GET THREADS LOGIC ---
 
     def get_forum_threads(self, course_id=None):
-        # Get all forum threads
-        pass
+        # get all threads from database
+        query = self.supabase.table('forum_threads').select('*')
+        if course_id:
+            query = query.eq('course_id', course_id)
+        
+        response = query.execute()
+        return response.data
+
+# --- CREATE THREAD LOGIC ---
 
     def create_thread(self, thread_data):
-        # Create new forum thread
-        pass
+        # insert new thread in database
+        response = self.supabase.table('forum_threads').insert({
+            "title": thread_data.get('title'),
+            "description": thread_data.get('description'),
+            "user_id": thread_data.get('user_id'),
+            "course_id": thread_data.get('course_id')  # optional
+        }).execute()
+        return response.data[0] if response.data else response.data
+    
+    # --- GET THREAD POSTS LOGIC ---
 
     def get_thread_posts(self, thread_id):
-        # Get all posts in a thread
-        pass
+        # get posts into specific threads 
+        response = self.supabase.table('forum_posts')\
+            .select('*')\
+            .eq('thread_id', thread_id)\
+            .execute()
+        return response.data
+
+# --- CREATE POST LOGIC ---
 
     def create_post(self, post_data):
-        # Create new forum post
-        pass
+        # insert new post into a thread
+        response = self.supabase.table('forum_posts').insert({
+            "thread_id": post_data.get('thread_id'),
+            "content": post_data.get('content'),
+            "user_id": post_data.get('user_id')
+        }).execute()
+        return response.data[0] if response.data else response.data
+
+# --- DELETE POST LOGIC ---
 
     def delete_post(self, post_id):
-        # Delete a post
-        pass
+        # delete a post
+        response = self.supabase.table('forum_posts')\
+            .delete()\
+            .eq('id', post_id)\
+            .execute()
+        return response.data

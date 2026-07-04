@@ -1,12 +1,9 @@
-<<<<<<< HEAD
-from backend.core.supabase_client import get_supabase_client
-=======
-from ...core.supabase_client import get_supabase_client
->>>>>>> 4ed59a1d7d2d56524150966236754f09e65a4059
+from core.supabase_client import supabase
+
 
 class EnrollmentService:
     def __init__(self):
-        self.supabase = get_supabase_client()
+        self.supabase = supabase
 
     def get_user_enrollments(self, user_id):
         # Get all courses user is enrolled in
