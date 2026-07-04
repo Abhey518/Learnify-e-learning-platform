@@ -41,7 +41,7 @@ export default function Login() {
       setSuccess('Logged in successfully! Redirecting...');
       
       // 3. Fallback tracking logic in case Flask doesn't provide a redirect_url property
-      const targetUrl = data.redirect_url || '/dashboard/student';
+      const targetUrl = data.redirect_url || '/dashboards/student';
 
       setTimeout(() => {
         window.location.href = targetUrl;
