@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import traceback
 from flask import Blueprint, jsonify, request
 from .services import QuizService
@@ -119,4 +118,4 @@ def submit_quiz(quiz_id):
 def get_quiz_results(quiz_id):
     # Get quiz results
     pass
->>>>>>> 4ed59a1d7d2d56524150966236754f09e65a4059
+
