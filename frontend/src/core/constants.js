@@ -17,8 +17,8 @@ export const ROLES = {
 
 export const QUIZ_TYPES = {
   MULTIPLE_CHOICE: 'multiple_choice',
-  SHORT_ANSWER: 'short_answer',
-  ESSAY: 'essay',
+  //SHORT_ANSWER: 'short_answer',
+  //ESSAY: 'essay',
 }
 
 // Messages

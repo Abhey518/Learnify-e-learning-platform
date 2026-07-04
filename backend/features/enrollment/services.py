@@ -2,7 +2,7 @@ from core.supabase_client import get_supabase_client
 
 class EnrollmentService:
     def __init__(self):
-        self.supabase = get_supabase_client()
+        self.supabase = supabase
 
     # FR-2.1: Get Course Catalog
     def get_catalog(self):
