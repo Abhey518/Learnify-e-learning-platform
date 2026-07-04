@@ -9,7 +9,6 @@ export default function Login() {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Fallback to /api if your VITE_API_URL environment string is blank
   const baseUrl = import.meta.env.VITE_API_URL || '/api';
 
   const handleChange = (e) => {
@@ -23,15 +22,13 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // 1. Send request and save raw HTTP response stream into a variable
       const response = await fetch(`${baseUrl}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
-        credentials: 'include' // Instructs your browser to save the session cookie
+        credentials: 'include'
       });
 
-      // 2. Extracted exactly ONCE to prevent body stream execution crashes
       const data = await response.json();
 
       if (!response.ok) {
@@ -40,8 +37,7 @@ export default function Login() {
 
       setSuccess('Logged in successfully! Redirecting...');
       
-      // 3. Fallback tracking logic in case Flask doesn't provide a redirect_url property
-      const targetUrl = data.redirect_url || '/dashboards/student';
+      const targetUrl = data.redirect_url || '/dashboard/student';
 
       setTimeout(() => {
         window.location.href = targetUrl;

@@ -3,38 +3,78 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute'
+import NotFoundPage from './components/NotFoundPage';
 
 import RegisterPage from './features/registration/RegisterPage';
 import LoginPage from './features/registration/LoginPage';
 import LandingPage from './LandingPage';
 import CoursesPage from './features/courses/CoursesPage';
+import AdminDashboardPage from './features/analytics/AdminDashboardPage';
+import SubmitReviewForm from './features/analytics/SubmitReviewForm';
+import CourseReviewsSection from './components/CourseReviewsSection';
+import InstructorAnalyticsPage from './features/analytics/InstructorAnalyticsPage';
+import InstructorPendingPage from './features/registration/InstructorPendingPage';
 import InstructorDashboard from './dashboards/InstructorDashboard';
 import StudentDashboard from './dashboards/StudentDashboard';
 import StudentLearningPage from './features/courses/StudentLearningPage';
 import StudentLessonPage from './features/courses/StudentLessonPage';
 
 
+
 export default function App() {
   return (
     <Router>
+      {/* Global Navigation Bar */}
+      <Navbar />
 
-      {/* Render the Navbar component on all pages */}
-      <Navbar /> 
-      
-      {/* Apply padding to avoid overlap with the fixed Navbar */}
       <main style={{ minHeight: '100vh', paddingTop: '72px', backgroundColor: '#f8f9fa' }}>
-        
         <Routes>
-          {/* Define the routes for the application */}
+          {/* Public Platform Core Pages */}
           <Route path="/" element={<LandingPage />} />
-          <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/submit-review" element={<SubmitReviewForm />} />
+          <Route path="/course-reviews/:courseId" element={<CourseReviewsSection />} />
 
-          {/* Catch-all route to redirect to the landing page for any undefined routes */}
-          {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
+
+          
+
+
+
+          <Route path="*" element={<NotFoundPage />} />
+
+
+
+
 
           <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <AdminDashboardPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/instructor-analytics" element={
+            <ProtectedRoute allowedRole="admin">
+              <InstructorAnalyticsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/instructor-analytics" element={
+            <ProtectedRoute allowedRole="instructor">
+              <InstructorAnalyticsPage />
+            </ProtectedRoute>
+          } />
+          <Route 
+          path="/dashboard/instructor/pending" 
+          element={
+            <ProtectedRoute allowedRole="pending_instructor">
+              <InstructorPendingPage />
+            </ProtectedRoute>
+          } 
+        />
+            
+            <Route 
             path="/dashboards/instructor"
             element={
               <ProtectedRoute allowedRoles="instructor">
@@ -68,10 +108,14 @@ export default function App() {
                 <StudentLessonPage />
               </ProtectedRoute>
             }
-          />  
-  
-          </Routes>
-        </main>
-      </Router>
+          />
+
+
+
+
+
+        </Routes>
+      </main>
+    </Router>
   );
 }
