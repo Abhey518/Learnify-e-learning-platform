@@ -31,7 +31,9 @@ import InstructorRejectedPage from './features/registration/InstructorRejectedPa
 import StudentDashboard from './dashboards/StudentDashboard';
 import StudentLearningPage from './features/courses/StudentLearningPage';
 import StudentLessonPage from './features/courses/StudentLessonPage';
-// import EnrollmentDashboard from './features/enrollment/EnrollmentDashboard';
+import quizRoutes from './features/quiz/routes';
+import QuizPage from './features/quiz/pages/QuizPage';
+import QuizListPage from './features/quiz/pages/QuizListPage';
 
 // Forum Pages
 import ForumThreads from './features/forum/ForumThreads';
@@ -67,6 +69,18 @@ export default function App() {
 
 
           <Route path="*" element={<NotFoundPage />} />
+            
+            
+          
+//             Have to check ///////////
+          <Route path="/" element={<Navigate to="/quizzes" replace />} />
+          <Route path="/courses/:courseId/quizzes" element={<QuizListPage userRole="student" />} />
+          <Route path="/courses/:courseId/quizzes/manage" element={<QuizListPage userRole="instructor" />} />
+          <Route path="/quizzes/:quizId" element={<QuizPage userRole="student" />} />
+          <Route path="/quizzes/:quizId/manage" element={<QuizPage userRole="instructor" />} />  
+            
+            ////////////////////////
+            
 
 
 

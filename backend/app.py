@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from features.registration.routes import auth
 from features.analytics.routes import analytics
@@ -21,6 +21,22 @@ app.register_blueprint(forum_bp)
 @app.route('/health', methods=['GET'])
 def health_check():
     return {'status': 'healthy'}, 20
+  
+  
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+
+@app.route('/routes')
+def list_routes():
+    output = []
+    for rule in app.url_map.iter_rules():
+        output.append(f"{rule.endpoint}: {rule.rule}")
+    return jsonify({"active_routes": output})
+
+@app.route('/')
+def index():
+    return "Learnify Backend is Running Successfully!"
+  
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+
