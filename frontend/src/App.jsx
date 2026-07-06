@@ -1,24 +1,42 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
+// Shared 
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute'
 import NotFoundPage from './components/NotFoundPage';
 
+// Registration Pages
 import RegisterPage from './features/registration/RegisterPage';
 import LoginPage from './features/registration/LoginPage';
+
+// Home Page
 import LandingPage from './LandingPage';
+
+// Course Pages
 import CoursesPage from './features/courses/CoursesPage';
-import AdminDashboardPage from './features/analytics/AdminDashboardPage';
+
+// Admin and Instructor Analytics Pages
+import AdminDashboardPage from './dashboards/AdminDashboardPage';
 import SubmitReviewForm from './features/analytics/SubmitReviewForm';
 import CourseReviewsSection from './components/CourseReviewsSection';
 import InstructorAnalyticsPage from './features/analytics/InstructorAnalyticsPage';
-import InstructorPendingPage from './features/registration/InstructorPendingPage';
+
+// Instructor Dashboards
 import InstructorDashboard from './dashboards/InstructorDashboard';
+import InstructorPendingPage from './features/registration/InstructorPendingPage';
+import InstructorRejectedPage from './features/registration/InstructorRejectedPage';
+
+// Student Dashboards and Learning Pages
 import StudentDashboard from './dashboards/StudentDashboard';
 import StudentLearningPage from './features/courses/StudentLearningPage';
 import StudentLessonPage from './features/courses/StudentLessonPage';
+// import EnrollmentDashboard from './features/enrollment/EnrollmentDashboard';
 
+// Forum Pages
+import ForumThreads from './features/forum/ForumThreads';
+import ThreadDetails from './features/forum/ThreadDetails';
+import Forum from './features/forum/Forum';
 
 
 export default function App() {
@@ -36,6 +54,12 @@ export default function App() {
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/submit-review" element={<SubmitReviewForm />} />
           <Route path="/course-reviews/:courseId" element={<CourseReviewsSection />} />
+          {/* <Route path="/enrollment" element={<EnrollmentDashboard />} /> */}
+
+          <Route path="/courses/:courseId/forum" element={<ForumThreads />} />
+          <Route path="/courses/:courseId/forum/:threadId" element={<ThreadDetails />} />
+          <Route path="/courses/:courseId/forum" element={<Forum />} />
+
 
 
           
@@ -66,7 +90,7 @@ export default function App() {
             </ProtectedRoute>
           } />
           <Route 
-          path="/dashboard/instructor/pending" 
+          path="/dashboards/instructor/pending" 
           element={
             <ProtectedRoute allowedRole="pending_instructor">
               <InstructorPendingPage />
@@ -74,14 +98,23 @@ export default function App() {
           } 
         />
             
-            <Route 
-            path="/dashboards/instructor"
-            element={
-              <ProtectedRoute allowedRoles="instructor">
-                <InstructorDashboard />
-              </ProtectedRoute>
-            }
-          />
+          <Route 
+          path="/dashboards/instructor"
+          element={
+            <ProtectedRoute allowedRoles="instructor">
+              <InstructorDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route 
+          path="/dashboards/instructor/rejected" 
+          element={
+            <ProtectedRoute allowedRole="rejected_instructor">
+              <InstructorRejectedPage />
+            </ProtectedRoute>
+          } 
+        />
 
           <Route 
             path="/dashboards/student"

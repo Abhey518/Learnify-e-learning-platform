@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
+
+// Added useNavigation
+import { useNavigate } from 'react-router-dom'; 
+
 import { supabase } from '../core/supabaseClient.js';
 
 export default function InstructorDashboard() {
+  const navigate = useNavigate(); // Added navigate hook
+  
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -392,6 +398,21 @@ export default function InstructorDashboard() {
                         </p>
                         
                         <div className="mt-4 d-flex flex-column gap-2 border-top pt-3">
+                          {/* ========================================================== */}
+                          {/* START: TEAMMATE INTEGRATION - COURSE DISCUSSION FORUM BUTTON */}
+                          {/* ========================================================== */}
+                          <button 
+                            className="btn btn-outline-primary rounded-pill fw-medium shadow-sm mb-1" 
+                            style={{ borderColor: '#6f42c1', color: '#6f42c1' }}
+                            onClick={() => navigate(`/courses/${course.id}/forum`)}
+                          >
+                            <i className="bi bi-chat-left-text-fill me-2"></i>Course Forum
+                          </button>
+                          {/* ========================================================== */}
+                          {/* END: TEAMMATE INTEGRATION - COURSE DISCUSSION FORUM BUTTON */}
+                          {/* ========================================================== */}
+
+
                           <button className="btn rounded-pill fw-medium text-white shadow-sm" style={{ backgroundColor: '#6f42c1' }} onClick={() => openCurriculum(course)}>
                             <i className="bi bi-list-check me-2"></i>Manage Curriculum
                           </button>

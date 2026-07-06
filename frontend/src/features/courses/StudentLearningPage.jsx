@@ -125,6 +125,46 @@ export default function StudentLearningPage() {
               </div>
             )}
 
+            {/* ========================================================================= */}
+            {/* START: DISCUSSION FORUM NAVIGATION CARD (For Teammate Integration) */}
+            {/* ========================================================================= */}
+            {course && (
+              <div 
+                className="card shadow-sm border-0 rounded-3 bg-white mb-4 overflow-hidden" 
+                style={{ borderLeft: '5px solid #6f42c1' }}
+              >
+                <div className="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                  <div className="d-flex align-items-center gap-3">
+                    {/* Discussion Icon container */}
+                    <div 
+                      className="p-3 rounded-circle d-flex align-items-center justify-content-center" 
+                      style={{ backgroundColor: '#f3e8ff', width: '50px', height: '50px' }}
+                    >
+                      <i className="bi bi-chat-left-text-fill fs-5" style={{ color: '#6f42c1' }}></i>
+                    </div>
+                    {/* Card Title & Text details */}
+                    <div>
+                      <h5 className="fw-bold mb-1 text-dark">Course Discussion Forum</h5>
+                      <p className="text-muted mb-0 small">
+                        Clear your doubts, ask questions, and collaborate with your instructor and fellow students.
+                      </p>
+                    </div>
+                  </div>
+                  {/* Button that routes the student directly to this course's discussion forum */}
+                  <button 
+                    onClick={() => navigate(`/courses/${courseId}/forum`)}
+                    className="btn text-white rounded-pill px-4 py-2 fw-medium shadow-sm transition-all"
+                    style={{ backgroundColor: '#6f42c1', borderColor: '#6f42c1' }}
+                  >
+                    Go to Forum <i className="bi bi-arrow-right ms-1"></i>
+                  </button>
+                </div>
+              </div>
+            )}
+            {/* ========================================================================= */}
+            {/* END: DISCUSSION FORUM NAVIGATION CARD */}
+            {/* ========================================================================= */}
+
             {modules.length === 0 ? (
               <div className="text-center p-5 bg-white rounded-3 text-muted shadow-sm">
                 <i className="bi bi-box-seam fs-1 text-secondary mb-2 d-block"></i>
