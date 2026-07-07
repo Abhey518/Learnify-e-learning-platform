@@ -83,11 +83,11 @@ The application offers a hierarchical curriculum builder where instructors can d
 2. Create and activate a Python virtual environment:
 
 ```bash
-python -m venv venv
+python -m venv .venv
 # On Windows:
-venv\Scripts\activate
+.venv\Scripts\activate
 # On macOS/Linux:
-source venv/bin/activate
+source .venv/bin/activate
 ```
 
 3. Install dependencies:
