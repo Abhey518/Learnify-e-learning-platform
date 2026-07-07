@@ -196,6 +196,7 @@ def get_all_instructors():
         response = supabase.table("profiles") \
             .select("id, name, email, created_at") \
             .eq("role", "instructor") \
+            .eq("status", "approved") \
             .execute()
         return {"success": True, "data": response.data}
     

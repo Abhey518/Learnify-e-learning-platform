@@ -1,6 +1,7 @@
 
 from flask import Blueprint, request, jsonify
 from .services import EnrollmentService
+from core.decorators import login_required, role_required
 
 enrollment_bp = Blueprint(
     "enrollment",

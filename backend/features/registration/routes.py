@@ -61,7 +61,13 @@ def login():
     status = result['status']
     
     if role == 'instructor':
-        redirect_url = "/dashboards/instructor/pending" if status == 'pending' else "/dashboards/instructor"
+        if status == 'pending':
+            redirect_url = "/dashboards/instructor/pending"
+        elif status == 'rejected':
+            redirect_url = "/dashboards/instructor/rejected"
+        else:
+            redirect_url = "/dashboards/instructor"
+            
     elif role == 'admin':
         redirect_url = "/admin"
     else:
@@ -91,6 +97,7 @@ def get_current_user():
         if session and session.get('user_id'):
             return jsonify({
                 "logged_in": True,
+                "user_id": session.get('user_id'), #updated line
                 "name" : session.get('name'),
                 "role": session.get('user_role', 'Student'),
                 "status": session.get('user_status')
