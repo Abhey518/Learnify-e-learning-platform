@@ -19,4 +19,3 @@ export default [
   // <Route path="/quizzes" element={<QuizListPage />} />,
   // <Route path="/quizzes/:id" element={<QuizPage />} />,
 ]
-

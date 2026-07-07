@@ -23,4 +23,3 @@ def validate_quiz_submission(data):
 def validate_answers(answers):
     # Validate quiz answers format
     return isinstance(answers, list) and len(answers) > 0
-

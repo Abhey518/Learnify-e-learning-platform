@@ -210,7 +210,7 @@ export default function StudentLessonPage() {
                 {actionLoading ? (
                   <>
                     <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                    {/* ✅ Dynamic change notification message state text */}
+                    {/* Dynamic change notification message state text */}
                     {error ? 'Error occurred...' : 'Progress Saved! Loading next lesson...'}
                   </>
                 ) : (

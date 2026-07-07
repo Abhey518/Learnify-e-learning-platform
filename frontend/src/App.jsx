@@ -37,7 +37,6 @@ import QuizPage from './features/quiz/pages/QuizPage';
 import QuizListPage from './features/quiz/pages/QuizListPage';
 
 
-
 export default function App() {
   return (
     <Router>
@@ -51,27 +50,8 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/courses" element={<CoursesPage />} />
-          {/* <Route path="/submit-review" element={<SubmitReviewForm />} /> */}
-          {/* <Route path="/course-reviews/:courseId" element={<CourseReviewsSection />} /> */}
-          {/* <Route path="/enrollment" element={<EnrollmentDashboard />} /> */}
-
-          
-
-          
-
-          
-
-
-
-          
-
-
 
           <Route path="*" element={<NotFoundPage />} />
-
-
-
-
 
           <Route 
           path="/admin" 
@@ -80,16 +60,22 @@ export default function App() {
               <AdminDashboardPage />
             </ProtectedRoute>
           } />
+
+
           <Route path="/instructor-analytics" element={
             <ProtectedRoute allowedRole="admin">
               <InstructorAnalyticsPage />
             </ProtectedRoute>
           } />
+
+
           <Route path="/instructor-analytics" element={
             <ProtectedRoute allowedRole="instructor">
               <InstructorAnalyticsPage />
             </ProtectedRoute>
           } />
+
+
           <Route 
           path="/dashboards/instructor/pending" 
           element={
@@ -144,7 +130,6 @@ export default function App() {
             }
           />
 
-
           <Route 
             path="/courses/:courseId/quizzes-list/:moduleId?"
             element={
@@ -162,11 +147,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-
-
           
-
-
           <Route 
             path="/courses/:courseId/forum"
             element={
@@ -175,19 +156,6 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-
-          
-
-
-
-
-
-
-
-
-
-
-
 
         </Routes>
       </main>
