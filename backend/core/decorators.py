@@ -1,19 +1,28 @@
 from functools import wraps
-from flask import jsonify
+from flask import session, jsonify
 
-def handle_errors(f):
+
+# Check that Logged or not 
+def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        try:
-            return f(*args, **kwargs)
-        except Exception as e:
-            return jsonify({'error': str(e)}), 500
-    return decorated_function
-
-def validate_json(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not request.is_json:
-            return jsonify({'error': 'Request must be JSON'}), 400
+        if not session.get('user_id'):
+            return jsonify({"error": "Unauthenticated: Active session required."}), 401
         return f(*args, **kwargs)
     return decorated_function
+
+
+# Check Logged user role 
+def role_required(allowed_roles):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not session.get('user_id'):
+                return jsonify({"error": "Unauthenticated: Active session required."}), 401
+            
+            if session.get('user_role') not in allowed_roles:
+                return jsonify({"error": "Access Denied: Insufficient permissions."}), 403
+                
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator

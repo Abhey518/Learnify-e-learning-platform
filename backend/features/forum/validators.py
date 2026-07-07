@@ -1,7 +1,7 @@
 def validate_thread(data):
-    required_fields = ['title', 'content', 'user_id']
+    required_fields = ['title', 'description', 'course_id']
     return all(field in data for field in required_fields)
 
-def validate_post(data):
-    required_fields = ['content', 'user_id', 'thread_id']
+def validate_reply(data):
+    required_fields = ['reply_message']
     return all(field in data for field in required_fields)
