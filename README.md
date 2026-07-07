@@ -163,7 +163,9 @@ npm run dev
 ## 📊 GitHub Contribution Summary
 To view the contribution history and commit records of our group members:
 
-* Visit the Contributors tab on GitHub: [GitHub Contributors Graph](https://github.com/Abhey518/Learnify-e-learning-platform/graphs/contributors)
+* View the visual timeline of branch activity and merges: [GitHub Network Graph](https://github.com/Abhey518/Learnify-e-learning-platform/network)
+
+* Visit the Contributors summary page: [GitHub Contributors Graph](https://github.com/Abhey518/Learnify-e-learning-platform/graphs/contributors)
 
 * Or execute this command in your terminal to see a summary list of commits by author:
 
