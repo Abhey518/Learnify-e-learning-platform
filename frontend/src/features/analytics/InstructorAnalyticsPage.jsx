@@ -145,7 +145,7 @@ export default function InstructorAnalyticsPage() {
                 <div className="card shadow-sm border-0 rounded-3 bg-white p-3 h-100">
                   <div className="d-flex justify-content-between align-items-center">
                     <div>
-                      <span className="text-secondary small fw-medium d-block mb-1">Active Modules</span>
+                      <span className="text-secondary small fw-medium d-block mb-1">Active Courses</span>
                       <h3 className="fw-bold text-dark mb-0">{analyticsData?.total_courses || coursesFilterList.length}</h3>
                     </div>
                     <div className="rounded-circle p-2.5 bg-primary bg-opacity-10 text-primary" style={{ color: '#6f42c1' }}>

@@ -169,7 +169,7 @@ export default function App() {
           <Route 
             path="/courses/:courseId/quizzes-list/:moduleId?"
             element={
-              <ProtectedRoute allowedRole={["student", "instructor"]}>
+              <ProtectedRoute allowedRoles={["student", "instructor"]}>
                 <QuizListPage />
               </ProtectedRoute>
             }
